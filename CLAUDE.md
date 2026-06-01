@@ -19,9 +19,9 @@ Sistema web de registro de matrículas para consultores de vendas da Uniasselvi,
 
 ## Backend — Supabase
 
-**Projeto Supabase:** a configurar
-**URL:** `SUPABASE_URL` (a preencher após criar projeto no Supabase)
-**Anon Key:** `SUPABASE_ANON_KEY` (a preencher)
+**Projeto Supabase:** `closers-uniasselvi`
+**URL:** `https://wfequjtoutpqvfyjdrvo.supabase.co`
+**Anon Key:** `sb_publishable_NYXnlMO9SZc4Sg3zxPCZtw_Uto0gecQ`
 
 **Tabelas planejadas:**
 - `matriculas` — registros de matrículas
@@ -35,8 +35,9 @@ Sistema web de registro de matrículas para consultores de vendas da Uniasselvi,
 ## GitHub Pages
 
 **Conta:** `vitrucontactSales`
-**Repositório:** a criar (`closers-forms-uniasselvi` sugerido)
-**Arquivos publicados:** `index.html`, `dashboard.html`, `relatorio.html`
+**Repositório:** `vitrucontactSales/closers-forms-uniasselvi`
+**URL pública:** `https://vitrucontactsales.github.io/closers-forms-uniasselvi/`
+**Arquivos publicados:** `index.html`, `dashboard.html`, `Logo_Uniasselvi.png`
 
 ---
 
@@ -90,10 +91,14 @@ Sistema web de registro de matrículas para consultores de vendas da Uniasselvi,
 
 ---
 
-## Pendências para iniciar desenvolvimento
+## Status do projeto
 
-- [ ] Lista de consultores
-- [ ] Lista de polos
-- [ ] Criar projeto no Supabase e obter URL + Anon Key
-- [ ] Criar repositório GitHub `closers-forms-uniasselvi`
-- [ ] Confirmar campos do formulário
+- [ ] Lista de consultores — aguardando coordenadora
+- [ ] Lista de polos — aguardando coordenadora
+- [x] Supabase configurado — tabelas `matriculas` e `colaboradores` criadas
+- [x] Repositório GitHub criado — `vitrucontactSales/closers-forms-uniasselvi`
+- [x] Formulário `index.html` — integrado com Supabase, tema dark, logo real
+- [x] Identidade visual Uniasselvi aplicada
+- [ ] Dashboard `dashboard.html` — criar após receber as listas
+- [ ] Email de notificação — Supabase Edge Function + Resend
+- [ ] Publicar no GitHub Pages
