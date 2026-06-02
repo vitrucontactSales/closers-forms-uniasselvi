@@ -263,22 +263,17 @@ textarea.ctrl { resize: vertical; min-height: 90px; }
           <option value="Adriano Reder Oliveira">Adriano Reder Oliveira</option>
           <option value="Adriel Wanderlind">Adriel Wanderlind</option>
           <option value="Adrielle Letícia Ferreira Da Silva De Almeida">Adrielle Letícia Ferreira Da Silva De Almeida</option>
-          <option value="Amanda Giraldi Arrozio">Amanda Giraldi Arrozio</option>
           <option value="Ana Beatriz Oliveira Rosa">Ana Beatriz Oliveira Rosa</option>
           <option value="Anna Julia Barbeta De Freitas">Anna Julia Barbeta De Freitas</option>
           <option value="Bruna Aparecida Nogueira">Bruna Aparecida Nogueira</option>
-          <option value="Bruna Cristo Ribeiro">Bruna Cristo Ribeiro</option>
           <option value="Deyse De Andrade Landim">Deyse De Andrade Landim</option>
           <option value="Gabriel Casseres Pires">Gabriel Casseres Pires</option>
           <option value="Gabriel Fabricio Santa Cruz">Gabriel Fabricio Santa Cruz</option>
           <option value="Gabriela Camargo Ribeiro">Gabriela Camargo Ribeiro</option>
-          <option value="Giovana Fidelis Guilhermetti">Giovana Fidelis Guilhermetti</option>
           <option value="Giovani Henrique Pimenta">Giovani Henrique Pimenta</option>
           <option value="Giulia Leite Delli Colli">Giulia Leite Delli Colli</option>
           <option value="Gustavo Gonçalves Amaro">Gustavo Gonçalves Amaro</option>
           <option value="Heloyse Abreu Favacho">Heloyse Abreu Favacho</option>
-          <option value="Ingrid Aparecida Dos Santos Lares Da Silva">Ingrid Aparecida Dos Santos Lares Da Silva</option>
-          <option value="Ivan Marques Daniel">Ivan Marques Daniel</option>
           <option value="Jose Mauro Silva De Paula">Jose Mauro Silva De Paula</option>
           <option value="João Elias Valero Dos Santos">João Elias Valero Dos Santos</option>
           <option value="João Vitor Silva Ribeiro">João Vitor Silva Ribeiro</option>
@@ -286,14 +281,11 @@ textarea.ctrl { resize: vertical; min-height: 90px; }
           <option value="Julia Mantovani Ferro">Julia Mantovani Ferro</option>
           <option value="Karoline Arceni Alves">Karoline Arceni Alves</option>
           <option value="Kauane Candido Da Silva">Kauane Candido Da Silva</option>
-          <option value="Kelly Joeisy De Lima">Kelly Joeisy De Lima</option>
-          <option value="Larissa Rafaela Alves">Larissa Rafaela Alves</option>
           <option value="Luiz Antonio Tosta Fernandes">Luiz Antonio Tosta Fernandes</option>
           <option value="Manuela Caetano Soria">Manuela Caetano Soria</option>
           <option value="Marcelo Martins Filho">Marcelo Martins Filho</option>
           <option value="Maria Clara Cesar Panhozzi">Maria Clara Cesar Panhozzi</option>
           <option value="Maria Eduarda Schamber">Maria Eduarda Schamber</option>
-          <option value="Maria Eduarda Siqueira Uzeika">Maria Eduarda Siqueira Uzeika</option>
           <option value="Maria Fernanda Do Nascimento Justino">Maria Fernanda Do Nascimento Justino</option>
           <option value="Mateus Felipe Gouveia De Souza">Mateus Felipe Gouveia De Souza</option>
           <option value="Matheus Da Costa De Paula">Matheus Da Costa De Paula</option>
@@ -307,12 +299,9 @@ textarea.ctrl { resize: vertical; min-height: 90px; }
           <option value="Roger Cauã Soares De Freitas">Roger Cauã Soares De Freitas</option>
           <option value="Rosivane Lopes De Aquino">Rosivane Lopes De Aquino</option>
           <option value="Samuel Pereira Covre">Samuel Pereira Covre</option>
-          <option value="Sara Camile Henrique Da Silva">Sara Camile Henrique Da Silva</option>
           <option value="Sarah Gouvea Dos Santos">Sarah Gouvea Dos Santos</option>
           <option value="Sthefani Cristina Fava Das Graças Nogueira">Sthefani Cristina Fava Das Graças Nogueira</option>
           <option value="Thaisa Fernanda Tenório Da Silveira Fogaça">Thaisa Fernanda Tenório Da Silveira Fogaça</option>
-          <option value="Vanessa Lemes Rodrigues">Vanessa Lemes Rodrigues</option>
-          <option value="Wellington Carlos Viana">Wellington Carlos Viana</option>
           <option value="Yara Vidal De Mattos">Yara Vidal De Mattos</option>
           <option value="Yasmin Dos Santos Moraes">Yasmin Dos Santos Moraes</option>
           <option value="Yasmin Rafaella Aparecida Gomes">Yasmin Rafaella Aparecida Gomes</option>
@@ -322,13 +311,13 @@ textarea.ctrl { resize: vertical; min-height: 90px; }
 
       <div class="group">
         <label class="label"><span class="num">2</span> Número do Contrato <span class="req">*</span></label>
-        <input class="ctrl" type="text" id="candidato" placeholder="Ex.: 202612345678"
-               inputmode="numeric" maxlength="20"
+        <input class="ctrl" type="text" id="candidato" placeholder="Ex.: 123456789"
+               inputmode="numeric" maxlength="30"
                oninput="validarCandidato(this)"
                onblur="verificarDuplicata(this)"
                required>
         <div class="field-hint" id="hintCandidato">
-          ⚠ O número do candidato deve começar com <strong>2026</strong>. Não utilize CPF.
+          ⚠ Use apenas números. Letras e símbolos não são permitidos.
         </div>
         <div class="field-hint" id="hintDuplicata">
           ⛔ Este candidato já foi cadastrado. Verifique o número antes de continuar.
@@ -336,17 +325,28 @@ textarea.ctrl { resize: vertical; min-height: 90px; }
       </div>
 
       <div class="group">
-        <label class="label"><span class="num">3</span> Data do Pagamento <span class="req">*</span></label>
-        <input class="ctrl" type="date" id="dataPagamento" required>
+        <label class="label"><span class="num">3</span> Data do Atendimento <span class="req">*</span></label>
+        <input class="ctrl" type="date" id="dataAtendimento" required>
       </div>
 
       <div class="group">
-        <label class="label"><span class="num">4</span> Link da Conversa <span class="req">*</span></label>
-        <input class="ctrl" type="text" id="linkConversa" placeholder="https://" required autocomplete="off">
+        <label class="label"><span class="num">4</span> Ticket <span class="req">*</span></label>
+        <input class="ctrl" type="text" id="ticket" placeholder="Ex.: TKT-12345" required autocomplete="off">
       </div>
 
       <div class="group">
-        <label class="label"><span class="num">5</span> Modalidade de Curso <span class="req">*</span></label>
+        <label class="label"><span class="num">5</span> Canal de Atendimento <span class="req">*</span></label>
+        <div class="sw">
+          <select class="ctrl" id="canalAtendimento" required>
+            <option value="">Selecione o Canal</option>
+            <option value="Interno">Interno</option>
+            <option value="Hag">Hag</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="group">
+        <label class="label"><span class="num">6</span> Modalidade de Curso <span class="req">*</span></label>
         <div class="sw">
           <select class="ctrl" id="modalidade" onchange="onModalidadeChange()" required>
             <option value="Graduação EAD">Graduação EAD</option>
@@ -370,19 +370,18 @@ textarea.ctrl { resize: vertical; min-height: 90px; }
       </div>
 
       <div class="group">
-        <label class="label"><span class="num">6</span> Gestor(a) <span class="req">*</span></label>
+        <label class="label"><span class="num">7</span> Gestor(a) <span class="req">*</span></label>
         <div class="sw">
           <select class="ctrl" id="gestor" required>
             <option value="">Selecione o(a) Gestor(a)</option>
+            <option value="Beatriz Ferrari Jordão">Beatriz Ferrari Jordão</option>
             <option value="Sandoval Eduardo Nazareth Souza">Sandoval Eduardo Nazareth Souza</option>
-            <option value="Patricia Maria Devecchi">Patricia Maria Devecchi</option>
-            <option value="Beatriz Ferrari Jordao">Beatriz Ferrari Jordao</option>
           </select>
         </div>
       </div>
 
       <div class="group">
-        <label class="label"><span class="num">7</span> Polo <span class="req">*</span></label>
+        <label class="label"><span class="num">8</span> Polo <span class="req">*</span></label>
         <div class="sw polo-wrap">
           <input class="ctrl" type="text" id="poloBusca"
                  placeholder="Digite o nome da cidade ou polo..."
@@ -1630,7 +1629,19 @@ textarea.ctrl { resize: vertical; min-height: 90px; }
       </div>
 
       <div class="group">
-        <label class="label"><span class="num">8</span> Observações</label>
+        <label class="label"><span class="num">9</span> Status <span class="req">*</span></label>
+        <div class="sw">
+          <select class="ctrl" id="status" required>
+            <option value="">Selecione o Status</option>
+            <option value="Aguardando Pagamento">Aguardando Pagamento</option>
+            <option value="Pago">Pago</option>
+            <option value="Contrato Gerado">Contrato Gerado</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="group">
+        <label class="label"><span class="num">10</span> Observações</label>
         <textarea class="ctrl" id="observacoes" placeholder="Observações relevantes sobre a matrícula..."></textarea>
       </div>
 
@@ -1761,7 +1772,10 @@ function getModalidadeFinal() {
 function validarCandidato(el) {
   const val = el.value.trim();
   const hint = document.getElementById('hintCandidato');
-  if (val.length > 0 && !val.startsWith('2026')) {
+  if (val.length > 0 && !/^\d+$/.test(val)) {
+    el.value = val.replace(/\D/g, '');
+  }
+  if (el.value.length > 0 && !/^\d+$/.test(el.value)) {
     el.style.borderColor = 'var(--vermelho)';
     hint.style.display = 'block';
   } else {
@@ -1773,7 +1787,7 @@ function validarCandidato(el) {
 
 async function verificarDuplicata(el) {
   const val = el.value.trim();
-  if (!val || !val.startsWith('2026')) return;
+  if (!val || !/^\d+$/.test(val)) return;
 
   // 1. Verifica localStorage (instantâneo)
   const dados = JSON.parse(localStorage.getItem(DADOS_KEY) || '[]');
@@ -1848,7 +1862,7 @@ document.addEventListener('click', e => {
 
 // ── Limpar ──
 function limpar() {
-  ['consultor','candidato','dataPagamento','linkConversa','observacoes','modalidade','subModalidade','gestor','polo']
+  ['consultor','candidato','dataAtendimento','ticket','canalAtendimento','status','observacoes','modalidade','subModalidade','gestor','polo']
     .forEach(id => { document.getElementById(id).value = ''; });
   document.getElementById('groupSubModalidade').style.display = 'none';
   document.getElementById('poloBusca').value = '';
@@ -1861,16 +1875,18 @@ function limpar() {
 
 // ── Registrar ──
 async function registrar() {
-  const consultor    = document.getElementById('consultor').value.trim();
-  const candidato    = document.getElementById('candidato').value.trim();
-  const dataPagamento= document.getElementById('dataPagamento').value;
-  const linkConversa = document.getElementById('linkConversa').value.trim();
-  const observacoes  = document.getElementById('observacoes').value.trim();
-  const modalidade   = document.getElementById('modalidade').value;
-  const polo         = document.getElementById('polo').value;
-  const gestor       = document.getElementById('gestor').value;
+  const consultor         = document.getElementById('consultor').value.trim();
+  const candidato         = document.getElementById('candidato').value.trim();
+  const dataAtendimento   = document.getElementById('dataAtendimento').value;
+  const ticket            = document.getElementById('ticket').value.trim();
+  const canalAtendimento  = document.getElementById('canalAtendimento').value;
+  const status            = document.getElementById('status').value;
+  const observacoes       = document.getElementById('observacoes').value.trim();
+  const modalidade        = document.getElementById('modalidade').value;
+  const polo              = document.getElementById('polo').value;
+  const gestor            = document.getElementById('gestor').value;
 
-  if (!consultor || !candidato || !dataPagamento || !linkConversa || !modalidade || !gestor) {
+  if (!consultor || !candidato || !dataAtendimento || !ticket || !canalAtendimento || !status || !modalidade || !gestor) {
     toastMsg('⚠ Preencha todos os campos obrigatórios.', '#FF5555'); return;
   }
   if (modalidade === 'Ed. Continuada' && !document.getElementById('subModalidade').value) {
@@ -1881,8 +1897,8 @@ async function registrar() {
     document.getElementById('poloBusca').style.borderColor = 'var(--vermelho)';
     document.getElementById('hintPolo').style.display = 'block'; return;
   }
-  if (!candidato.startsWith('2026')) {
-    toastMsg('⚠ Número do candidato inválido. Deve começar com 2026.', '#FF5555');
+  if (!/^\d+$/.test(candidato)) {
+    toastMsg('⚠ Número do contrato inválido. Use apenas números.', '#FF5555');
     document.getElementById('hintCandidato').style.display = 'block'; return;
   }
 
@@ -1905,12 +1921,15 @@ async function registrar() {
   const { error } = await db.from('matriculas').insert({
     consultor,
     candidato,
-    data_pagamento: dataPagamento,
-    link_conversa:  linkConversa,
+    data_atendimento:  dataAtendimento,
+    ticket,
+    canal_atendimento: canalAtendimento,
+    status,
     observacoes,
     polo,
-    modalidade:     modalidadeFinal,
-    gestor
+    modalidade:        modalidadeFinal,
+    gestor,
+    registrado_em:     new Date().toISOString()
   });
 
   if (error) {
@@ -1926,8 +1945,9 @@ async function registrar() {
 
   // Backup no localStorage
   const id = dados.length ? Math.max(...dados.map(d => d.id || 0)) + 1 : 1;
-  dados.push({ id, consultor, candidato, data: dataPagamento, link: linkConversa,
-               obs: observacoes, polo, modalidade: modalidadeFinal, gestor, registrado_em: agora });
+  dados.push({ id, consultor, candidato, data_atendimento: dataAtendimento, ticket,
+               canal_atendimento: canalAtendimento, status, obs: observacoes,
+               polo, modalidade: modalidadeFinal, gestor, registrado_em: agora });
   localStorage.setItem(DADOS_KEY, JSON.stringify(dados));
 
   btn.disabled = false; btn.textContent = '✔ Registrar Matrícula';
