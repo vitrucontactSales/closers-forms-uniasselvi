@@ -1631,12 +1631,18 @@ textarea.ctrl { resize: vertical; min-height: 90px; }
       <div class="group">
         <label class="label"><span class="num">9</span> Status <span class="req">*</span></label>
         <div class="sw">
-          <select class="ctrl" id="status" required>
+          <select class="ctrl" id="status" onchange="onStatusChange()" required>
             <option value="">Selecione o Status</option>
             <option value="Aguardando Pagamento">Aguardando Pagamento</option>
             <option value="Pago">Pago</option>
-            <option value="Contrato Gerado">Contrato Gerado</option>
           </select>
+        </div>
+      </div>
+
+      <div id="groupDataPagamento" style="display:none">
+        <div class="sub-group">
+          <label class="sub-label"><span class="num-sub">↳</span> Data do Pagamento <span class="req">*</span></label>
+          <input class="ctrl" type="date" id="dataPagamento">
         </div>
       </div>
 
@@ -1745,6 +1751,18 @@ function toastMsg(msg, cor = '#2ECC71') {
   t.style.color = cor === '#2ECC71' ? '#000' : '#fff';
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ── Status ──
+function onStatusChange() {
+  const val = document.getElementById('status').value;
+  const grp = document.getElementById('groupDataPagamento');
+  if (val === 'Pago') {
+    grp.style.display = 'block';
+  } else {
+    grp.style.display = 'none';
+    document.getElementById('dataPagamento').value = '';
+  }
 }
 
 // ── Modalidade de Curso ──
@@ -1862,9 +1880,10 @@ document.addEventListener('click', e => {
 
 // ── Limpar ──
 function limpar() {
-  ['consultor','candidato','dataAtendimento','ticket','canalAtendimento','status','observacoes','modalidade','subModalidade','gestor','polo']
+  ['consultor','candidato','dataAtendimento','ticket','canalAtendimento','status','dataPagamento','observacoes','modalidade','subModalidade','gestor','polo']
     .forEach(id => { document.getElementById(id).value = ''; });
   document.getElementById('groupSubModalidade').style.display = 'none';
+  document.getElementById('groupDataPagamento').style.display = 'none';
   document.getElementById('poloBusca').value = '';
   _poloSelecionado = '';
   ['hintPolo','hintCandidato','hintDuplicata'].forEach(id => {
@@ -1881,6 +1900,7 @@ async function registrar() {
   const ticket            = document.getElementById('ticket').value.trim();
   const canalAtendimento  = document.getElementById('canalAtendimento').value;
   const status            = document.getElementById('status').value;
+  const dataPagamento     = document.getElementById('dataPagamento').value;
   const observacoes       = document.getElementById('observacoes').value.trim();
   const modalidade        = document.getElementById('modalidade').value;
   const polo              = document.getElementById('polo').value;
@@ -1888,6 +1908,9 @@ async function registrar() {
 
   if (!consultor || !candidato || !dataAtendimento || !ticket || !canalAtendimento || !status || !modalidade || !gestor) {
     toastMsg('⚠ Preencha todos os campos obrigatórios.', '#FF5555'); return;
+  }
+  if (status === 'Pago' && !dataPagamento) {
+    toastMsg('⚠ Informe a Data do Pagamento.', '#FF5555'); return;
   }
   if (modalidade === 'Ed. Continuada' && !document.getElementById('subModalidade').value) {
     toastMsg('⚠ Selecione o tipo de Ed. Continuada.', '#FF5555'); return;
@@ -1925,6 +1948,7 @@ async function registrar() {
     ticket,
     canal_atendimento: canalAtendimento,
     status,
+    data_pagamento:    dataPagamento || null,
     observacoes,
     polo,
     modalidade:        modalidadeFinal,
