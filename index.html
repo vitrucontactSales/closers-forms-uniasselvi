@@ -236,7 +236,7 @@ textarea.ctrl { resize: vertical; min-height: 90px; }
     <img src="Logo_Uniasselvi.png" width="42" height="42" style="border-radius:6px;object-fit:contain;" alt="Uniasselvi">
     <div>
       <div class="h-title">Uniasselvi</div>
-      <div class="h-sub">CLOSERS · REGISTRO DE MATRÍCULAS</div>
+      <div class="h-sub">REGISTRO DE MATRÍCULAS</div>
     </div>
   </div>
   <div class="nav-links">
@@ -248,15 +248,26 @@ textarea.ctrl { resize: vertical; min-height: 90px; }
 <div class="wrapper">
   <div class="card">
     <div class="card-head">
-      <h1>Closers — <span>Uniasselvi</span></h1>
-      <p>Registro de matrículas · Equipe Closers</p>
+      <h1>Portal de Registro de Matrículas <span>Uniasselvi</span></h1>
+      <p>Edital 2026/2</p>
     </div>
     <div class="req-note">⚠ Todos os campos marcados com <strong> * </strong> são obrigatórios.</div>
 
     <div class="body">
 
       <div class="group">
-        <label class="label"><span class="num">1</span> Nome do(a) Consultor(a) <span class="req">*</span></label>
+        <label class="label"><span class="num">1</span> Origem da Matrícula <span class="req">*</span></label>
+        <div class="sw">
+          <select class="ctrl" id="origemMatricula" required>
+            <option value="">Selecione a Origem</option>
+            <option value="Contact Center">Contact Center</option>
+            <option value="Leo App/Web">Leo App/Web</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="group">
+        <label class="label"><span class="num">2</span> Nome do(a) Consultor(a) <span class="req">*</span></label>
         <div class="sw">
           <select class="ctrl" id="consultor" required>
             <option value="">Selecione o(a) Consultor(a)</option>
@@ -310,7 +321,7 @@ textarea.ctrl { resize: vertical; min-height: 90px; }
       </div>
 
       <div class="group">
-        <label class="label"><span class="num">2</span> Número do Contrato <span class="req">*</span></label>
+        <label class="label"><span class="num">3</span> Número do Contrato <span class="req">*</span></label>
         <input class="ctrl" type="text" id="candidato" placeholder="Ex.: 123456789"
                inputmode="numeric" maxlength="30"
                oninput="validarCandidato(this)"
@@ -325,17 +336,17 @@ textarea.ctrl { resize: vertical; min-height: 90px; }
       </div>
 
       <div class="group">
-        <label class="label"><span class="num">3</span> Data do Atendimento <span class="req">*</span></label>
+        <label class="label"><span class="num">4</span> Data do Atendimento <span class="req">*</span></label>
         <input class="ctrl" type="date" id="dataAtendimento" required>
       </div>
 
       <div class="group">
-        <label class="label"><span class="num">4</span> Ticket <span class="req">*</span></label>
+        <label class="label"><span class="num">5</span> Ticket <span class="req">*</span></label>
         <input class="ctrl" type="text" id="ticket" placeholder="Ex.: TKT-12345" required autocomplete="off">
       </div>
 
       <div class="group">
-        <label class="label"><span class="num">5</span> Canal de Atendimento <span class="req">*</span></label>
+        <label class="label"><span class="num">6</span> Canal de Atendimento <span class="req">*</span></label>
         <div class="sw">
           <select class="ctrl" id="canalAtendimento" required>
             <option value="">Selecione o Canal</option>
@@ -346,7 +357,7 @@ textarea.ctrl { resize: vertical; min-height: 90px; }
       </div>
 
       <div class="group">
-        <label class="label"><span class="num">6</span> Modalidade de Curso <span class="req">*</span></label>
+        <label class="label"><span class="num">7</span> Modalidade de Curso <span class="req">*</span></label>
         <div class="sw">
           <select class="ctrl" id="modalidade" onchange="onModalidadeChange()" required>
             <option value="Graduação EAD">Graduação EAD</option>
@@ -370,7 +381,7 @@ textarea.ctrl { resize: vertical; min-height: 90px; }
       </div>
 
       <div class="group">
-        <label class="label"><span class="num">7</span> Gestor(a) <span class="req">*</span></label>
+        <label class="label"><span class="num">8</span> Gestor(a) <span class="req">*</span></label>
         <div class="sw">
           <select class="ctrl" id="gestor" required>
             <option value="">Selecione o(a) Gestor(a)</option>
@@ -381,7 +392,7 @@ textarea.ctrl { resize: vertical; min-height: 90px; }
       </div>
 
       <div class="group">
-        <label class="label"><span class="num">8</span> Polo <span class="req">*</span></label>
+        <label class="label"><span class="num">9</span> Polo <span class="req">*</span></label>
         <div class="sw polo-wrap">
           <input class="ctrl" type="text" id="poloBusca"
                  placeholder="Digite o nome da cidade ou polo..."
@@ -1629,25 +1640,26 @@ textarea.ctrl { resize: vertical; min-height: 90px; }
       </div>
 
       <div class="group">
-        <label class="label"><span class="num">9</span> Status <span class="req">*</span></label>
+        <label class="label"><span class="num">10</span> Status <span class="req">*</span></label>
         <div class="sw">
           <select class="ctrl" id="status" onchange="onStatusChange()" required>
             <option value="">Selecione o Status</option>
             <option value="Aguardando Pagamento">Aguardando Pagamento</option>
-            <option value="Pago">Pago</option>
+            <option value="Pago na data do vencimento">Pago na data do vencimento</option>
+            <option value="Boleto Pago Antecipado">Boleto Pago Antecipado</option>
           </select>
         </div>
       </div>
 
       <div id="groupDataPagamento" style="display:none">
         <div class="sub-group">
-          <label class="sub-label"><span class="num-sub">↳</span> Data do Pagamento <span class="req">*</span></label>
+          <label class="sub-label"><span class="num-sub">↳</span> <span id="labelDataPagamento">Data do Pagamento</span> <span class="req">*</span></label>
           <input class="ctrl" type="date" id="dataPagamento">
         </div>
       </div>
 
       <div class="group">
-        <label class="label"><span class="num">10</span> Observações</label>
+        <label class="label"><span class="num">11</span> Observações</label>
         <textarea class="ctrl" id="observacoes" placeholder="Observações relevantes sobre a matrícula..."></textarea>
       </div>
 
@@ -1757,7 +1769,12 @@ function toastMsg(msg, cor = '#2ECC71') {
 function onStatusChange() {
   const val = document.getElementById('status').value;
   const grp = document.getElementById('groupDataPagamento');
-  if (val === 'Pago') {
+  const lbl = document.getElementById('labelDataPagamento');
+  if (val === 'Pago na data do vencimento') {
+    lbl.textContent = 'Data do Pagamento';
+    grp.style.display = 'block';
+  } else if (val === 'Boleto Pago Antecipado') {
+    lbl.textContent = 'Data do Pagamento Antecipado';
     grp.style.display = 'block';
   } else {
     grp.style.display = 'none';
@@ -1894,6 +1911,7 @@ function limpar() {
 
 // ── Registrar ──
 async function registrar() {
+  const origemMatricula   = document.getElementById('origemMatricula').value;
   const consultor         = document.getElementById('consultor').value.trim();
   const candidato         = document.getElementById('candidato').value.trim();
   const dataAtendimento   = document.getElementById('dataAtendimento').value;
@@ -1906,10 +1924,10 @@ async function registrar() {
   const polo              = document.getElementById('polo').value;
   const gestor            = document.getElementById('gestor').value;
 
-  if (!consultor || !candidato || !dataAtendimento || !ticket || !canalAtendimento || !status || !modalidade || !gestor) {
+  if (!origemMatricula || !consultor || !candidato || !dataAtendimento || !ticket || !canalAtendimento || !status || !modalidade || !gestor) {
     toastMsg('⚠ Preencha todos os campos obrigatórios.', '#FF5555'); return;
   }
-  if (status === 'Pago' && !dataPagamento) {
+  if ((status === 'Pago na data do vencimento' || status === 'Boleto Pago Antecipado') && !dataPagamento) {
     toastMsg('⚠ Informe a Data do Pagamento.', '#FF5555'); return;
   }
   if (modalidade === 'Ed. Continuada' && !document.getElementById('subModalidade').value) {
@@ -1942,6 +1960,7 @@ async function registrar() {
 
   // Salva no Supabase
   const { error } = await db.from('matriculas').insert({
+    origem_matricula:  origemMatricula,
     consultor,
     candidato,
     data_atendimento:  dataAtendimento,
@@ -1969,7 +1988,8 @@ async function registrar() {
 
   // Backup no localStorage
   const id = dados.length ? Math.max(...dados.map(d => d.id || 0)) + 1 : 1;
-  dados.push({ id, consultor, candidato, data_atendimento: dataAtendimento, ticket,
+  dados.push({ id, origem_matricula: origemMatricula, consultor, candidato,
+               data_atendimento: dataAtendimento, ticket,
                canal_atendimento: canalAtendimento, status, obs: observacoes,
                polo, modalidade: modalidadeFinal, gestor, registrado_em: agora });
   localStorage.setItem(DADOS_KEY, JSON.stringify(dados));
