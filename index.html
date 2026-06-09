@@ -268,56 +268,16 @@ textarea.ctrl { resize: vertical; min-height: 90px; }
 
       <div class="group">
         <label class="label"><span class="num">2</span> Nome do(a) Consultor(a) <span class="req">*</span></label>
-        <div class="sw">
-          <select class="ctrl" id="consultor" required>
-            <option value="">Selecione o(a) Consultor(a)</option>
-          <option value="Adriano Reder Oliveira">Adriano Reder Oliveira</option>
-          <option value="Adriel Wanderlind">Adriel Wanderlind</option>
-          <option value="Adrielle Letícia Ferreira Da Silva De Almeida">Adrielle Letícia Ferreira Da Silva De Almeida</option>
-          <option value="Ana Beatriz Oliveira Rosa">Ana Beatriz Oliveira Rosa</option>
-          <option value="Anna Julia Barbeta De Freitas">Anna Julia Barbeta De Freitas</option>
-          <option value="Bruna Aparecida Nogueira">Bruna Aparecida Nogueira</option>
-          <option value="Deyse De Andrade Landim">Deyse De Andrade Landim</option>
-          <option value="Gabriel Casseres Pires">Gabriel Casseres Pires</option>
-          <option value="Gabriel Fabricio Santa Cruz">Gabriel Fabricio Santa Cruz</option>
-          <option value="Gabriela Camargo Ribeiro">Gabriela Camargo Ribeiro</option>
-          <option value="Giovani Henrique Pimenta">Giovani Henrique Pimenta</option>
-          <option value="Giulia Leite Delli Colli">Giulia Leite Delli Colli</option>
-          <option value="Gustavo Gonçalves Amaro">Gustavo Gonçalves Amaro</option>
-          <option value="Heloyse Abreu Favacho">Heloyse Abreu Favacho</option>
-          <option value="Jose Mauro Silva De Paula">Jose Mauro Silva De Paula</option>
-          <option value="João Elias Valero Dos Santos">João Elias Valero Dos Santos</option>
-          <option value="João Vitor Silva Ribeiro">João Vitor Silva Ribeiro</option>
-          <option value="Julia Barbosa Da Silva">Julia Barbosa Da Silva</option>
-          <option value="Julia Mantovani Ferro">Julia Mantovani Ferro</option>
-          <option value="Karoline Arceni Alves">Karoline Arceni Alves</option>
-          <option value="Kauane Candido Da Silva">Kauane Candido Da Silva</option>
-          <option value="Luiz Antonio Tosta Fernandes">Luiz Antonio Tosta Fernandes</option>
-          <option value="Manuela Caetano Soria">Manuela Caetano Soria</option>
-          <option value="Marcelo Martins Filho">Marcelo Martins Filho</option>
-          <option value="Maria Clara Cesar Panhozzi">Maria Clara Cesar Panhozzi</option>
-          <option value="Maria Eduarda Schamber">Maria Eduarda Schamber</option>
-          <option value="Maria Fernanda Do Nascimento Justino">Maria Fernanda Do Nascimento Justino</option>
-          <option value="Mateus Felipe Gouveia De Souza">Mateus Felipe Gouveia De Souza</option>
-          <option value="Matheus Da Costa De Paula">Matheus Da Costa De Paula</option>
-          <option value="Murilo Alexandre De Assis">Murilo Alexandre De Assis</option>
-          <option value="Nathalia De Carvalho Cabral">Nathalia De Carvalho Cabral</option>
-          <option value="Nathalia Gagliati Halchuk Dos Santos">Nathalia Gagliati Halchuk Dos Santos</option>
-          <option value="Nicole Ribeiro Dos Santos">Nicole Ribeiro Dos Santos</option>
-          <option value="Patricia Maria Devecchi">Patricia Maria Devecchi</option>
-          <option value="Paulo Ricardo Henrique De Sousa Vital">Paulo Ricardo Henrique De Sousa Vital</option>
-          <option value="Rebeca Batista De Oliveira Santos">Rebeca Batista De Oliveira Santos</option>
-          <option value="Roger Cauã Soares De Freitas">Roger Cauã Soares De Freitas</option>
-          <option value="Rosivane Lopes De Aquino">Rosivane Lopes De Aquino</option>
-          <option value="Samuel Pereira Covre">Samuel Pereira Covre</option>
-          <option value="Sarah Gouvea Dos Santos">Sarah Gouvea Dos Santos</option>
-          <option value="Sthefani Cristina Fava Das Graças Nogueira">Sthefani Cristina Fava Das Graças Nogueira</option>
-          <option value="Thaisa Fernanda Tenório Da Silveira Fogaça">Thaisa Fernanda Tenório Da Silveira Fogaça</option>
-          <option value="Yara Vidal De Mattos">Yara Vidal De Mattos</option>
-          <option value="Yasmin Dos Santos Moraes">Yasmin Dos Santos Moraes</option>
-          <option value="Yasmin Rafaella Aparecida Gomes">Yasmin Rafaella Aparecida Gomes</option>
-          </select>
+        <div class="polo-wrap">
+          <input class="ctrl" type="text" id="consultorBusca"
+                 placeholder="Digite para buscar o(a) consultor(a)..."
+                 autocomplete="off"
+                 oninput="filtrarConsultor()"
+                 onfocus="abrirConsultorDropdown()"
+                 onkeydown="navConsultorTeclado(event)">
+          <div class="polo-dropdown" id="consultorDropdown"></div>
         </div>
+        <input type="hidden" id="consultor">
       </div>
 
       <div class="group">
@@ -1843,6 +1803,208 @@ function _marcarDuplicata(el) {
   document.getElementById('hintDuplicata').style.display = 'block';
 }
 
+// ── Consultor Autocomplete ──
+const LISTA_CONSULTORES = [
+  "Adriano Reder Oliveira",
+  "Adriel Wanderlind",
+  "Adrielle Letícia Ferreira da Silva de Almeida",
+  "Alexia Tainara Taioqui Dos Santos",
+  "Allan Karlo De Oliveira",
+  "Amanda Cristina Soares",
+  "Amanda Das Neves Pacola",
+  "Amanda Giraldi Arrozio",
+  "Amanda Santin Dolis",
+  "Ana Beatriz Oliveira Rosa",
+  "Ana Caroline Cartoni Lopes",
+  "Ana Lya De Souza Rezende",
+  "Andrea Santos Nuevo Galan",
+  "Anna Gabryella Nunes",
+  "Anna Julia Barbeta De Freitas",
+  "Anna Karolina Cardoso Adriano Rosella",
+  "Antonio Carlos Milani Nardini",
+  "Beatriz Dos Santos Ribeiro",
+  "Beatriz Ferrari Jordao",
+  "Bianca De Souza Pupin",
+  "Bianca Santos Souza",
+  "Bruna Aparecida Nogueira",
+  "Bruna Cristo Ribeiro",
+  "Bruna Martins Dias",
+  "Bruna Siena",
+  "Bruna Stedile Figueiredo",
+  "Camila Melo",
+  "Carina Regina Barbosa Pezini",
+  "Cassia Leticia Oliveira Soares",
+  "Chaiane Conceição Panian Machado",
+  "Claudia Azuaga",
+  "Claudineia Ferreira Da Silva",
+  "Davi Rippi Paié Verissimo De Luna",
+  "Deyse de Andrade Landim",
+  "Elaine Fernandes Boaventura",
+  "Elen Carolina dos Santos",
+  "Eli Pereira Primo",
+  "Enzo Matteo Sousa De Oliveira",
+  "Esdras Santana da Silva",
+  "Evelyn Adriana Barbosa Da Silva",
+  "Fernanda de Souza Venancio",
+  "Flavia Cristina Dos Santos Sousa",
+  "Gabriel Casseres Pires",
+  "Gabriel Gustavo De Oliveira Silva",
+  "Gabriel Kauê Santos Da Silva",
+  "Gabriel Rodrigues Alves Pereira",
+  "Gabriela Camargo Ribeiro",
+  "Gabriela Zalasik",
+  "Geovanna Gabriely Rolim de Araujo",
+  "Giovana Lauer Linhares",
+  "Giovani Henrique Pimenta",
+  "Giovanna Victoria dos Santos Macedo Mariano",
+  "Gisele Cristina Florentino",
+  "Giulia Leite Delli Colli",
+  "Gleiciane Do Nascimento Dias",
+  "Gustavo Gonçalves Amaro",
+  "Gustavo Pivatto Cavalin",
+  "Haillany Marinho Da Silva",
+  "Helio Gabriel dos Santos",
+  "Heloyse Abreu Favacho",
+  "Ingrid Aparecida dos Santos Lares da Silva",
+  "Ivan Marques Daniel",
+  "Izabela Tahisa Alves Procopio",
+  "Jaqueline Alves Vicente",
+  "Jefferson Andres De Souza Rozas",
+  "Jennifer da Silva Mello",
+  "Jheniffer do Nascimento Oliveira",
+  "Joao Victor Ribeiro de Souza",
+  "Joao Vitor Silva Ribeiro",
+  "Jonas Alves",
+  "Jose Mauro Silva de Paula",
+  "Joyce Daya Vieira",
+  "João Elias Valero dos Santos",
+  "João Pedro Diniz de Assis",
+  "Julia Barbosa da Silva",
+  "Julia Mantovani Ferro",
+  "Juliana Rosa Marinho",
+  "Karina Abel Marques",
+  "Karlena Crys Ribeiro Da Silva",
+  "Kauan Miguel Gomes Da Silva",
+  "Kauane Candido da Silva",
+  "Kauany Yasmin Vicente Lopes",
+  "Kauã Vinícius Muniz Pita",
+  "Kawane Alessandra Lourenço Oliveira",
+  "Kelly Cristina Do Amaral",
+  "Kelly Joeisy de Lima",
+  "Larissa Silva Lage",
+  "Laura Caethane Nunes Goncalves",
+  "Laynara Luvisuto Colli Martins",
+  "Leonardo Campelo Ribeiro",
+  "Leticia Paiva Gini",
+  "Leticia Ramos Nesta",
+  "Lidia Venancio Moura",
+  "Livia Kaori Matsuda",
+  "Lorena Gabrielle Leite Barbosa",
+  "Lorraine dos Santos da Costa",
+  "Lucas Rodrigues Ueno",
+  "Luiz Antonio Tosta Fernandes",
+  "Manuela Caetano Soria",
+  "Marcelo Martins Filho",
+  "Maria Clara Cesar Panhozzi",
+  "Maria Eduarda Dos Santos Candido",
+  "Maria Eduarda Schamber",
+  "Maria Fernanda do Nascimento Justino",
+  "Maria Vitoria Marques",
+  "Mariana Ferreira Gomes Barbosa",
+  "Marina Viana Angelo",
+  "Mateus Felipe Gouveia de Souza",
+  "Matheus da Costa de Paula",
+  "Matheus Rinsi Da Silva",
+  "Milena Da Silva Rosa",
+  "Murilo Alexandre de Assis",
+  "Nathalia de Carvalho Cabral",
+  "Nathalia Gagliati Halchuk dos Santos",
+  "Nicole da Silva Vicente",
+  "Nicole Ribeiro Dos Santos",
+  "Patricia Maria Devecchi",
+  "Paulo Henrique Ferreira",
+  "Paulo Parra Misak",
+  "Paulo Ricardo Henrique De Sousa Vital",
+  "Pedro Lucas Braga Caetano",
+  "Raabe Maristela Moreira Couto Bonfim",
+  "Rafaela Rodrigues Mendes",
+  "Rodrigo Guido Marcondes",
+  "Rodrigo Manhani Rodrigues de Oliveira",
+  "Roger Cauã Soares de Freitas",
+  "Rosivane Lopes de Aquino",
+  "Ruama Rosa Dos Santos Silva",
+  "Ryan Guilherme Da Silva Rosa",
+  "Samuel Pereira Covre",
+  "Sandoval Eduardo Nazareth Souza",
+  "Sara Camile Henrique da Silva",
+  "Sthefani Cristina fava das Graças Nogueira",
+  "Talita Costa Ferreira",
+  "Tatiana Cristina Korc",
+  "Thaina Telles Benatti",
+  "Thaisa Fernanda Tenório da Silveira Fogaça",
+  "Thalita Diandra da Silva",
+  "Thiago Lima Dos Santos",
+  "Thiago Rinsi da Silva",
+  "Vanderlei Rodrigues de Souza Junior",
+  "Vanessa Lemes Rodrigues",
+  "Victor Hugo dos Santos Mucenieks",
+  "Virgilia Cabral Pereira",
+  "Vitoria De Souza Dias",
+  "Viviane Martins De Santana Santos",
+  "Wanessa Cristina Martinelli Camargo Da Costa",
+  "Wellington Carlos Viana",
+  "Yara Vidal de Mattos",
+  "Yasmin dos Santos Moraes",
+  "Yasmin Rafaella Aparecida Gomes",
+];
+
+let _consultorSelecionado = '';
+let _consultorAtivo = -1;
+
+function filtrarConsultor() {
+  _consultorSelecionado = '';
+  document.getElementById('consultor').value = '';
+  const q    = document.getElementById('consultorBusca').value.toLowerCase().trim();
+  const drop = document.getElementById('consultorDropdown');
+  _consultorAtivo = -1;
+  if (!q) { drop.style.display = 'none'; return; }
+  const matches = LISTA_CONSULTORES.filter(n => n.toLowerCase().includes(q));
+  if (!matches.length) {
+    drop.innerHTML = '<div class="polo-nenhum">Nenhum resultado encontrado.</div>';
+  } else {
+    drop.innerHTML = matches.map(n =>
+      `<div class="polo-item" onclick="selecionarConsultor('${n.replace(/'/g, "\\'")}')">${n}</div>`
+    ).join('');
+  }
+  drop.style.display = 'block';
+}
+
+function abrirConsultorDropdown() {
+  if (document.getElementById('consultorBusca').value.trim()) filtrarConsultor();
+}
+
+function selecionarConsultor(val) {
+  _consultorSelecionado = val;
+  document.getElementById('consultorBusca').value = val;
+  document.getElementById('consultor').value = val;
+  document.getElementById('consultorDropdown').style.display = 'none';
+  document.getElementById('consultorBusca').style.borderColor = '';
+}
+
+function navConsultorTeclado(e) {
+  const items = document.querySelectorAll('#consultorDropdown .polo-item');
+  if (!items.length) return;
+  if (e.key === 'ArrowDown') _consultorAtivo = Math.min(_consultorAtivo + 1, items.length - 1);
+  else if (e.key === 'ArrowUp') _consultorAtivo = Math.max(_consultorAtivo - 1, 0);
+  else if (e.key === 'Enter' && _consultorAtivo >= 0) {
+    e.preventDefault();
+    selecionarConsultor(items[_consultorAtivo].textContent);
+    return;
+  } else return;
+  items.forEach((el, i) => el.classList.toggle('ativo', i === _consultorAtivo));
+  items[_consultorAtivo]?.scrollIntoView({ block: 'nearest' });
+}
+
 // ── Polo Autocomplete ──
 let _poloSelecionado = '';
 let _poloAtivo = -1;
@@ -1901,6 +2063,9 @@ function limpar() {
     .forEach(id => { document.getElementById(id).value = ''; });
   document.getElementById('groupSubModalidade').style.display = 'none';
   document.getElementById('groupDataPagamento').style.display = 'none';
+  document.getElementById('consultorBusca').value = '';
+  document.getElementById('consultorDropdown').style.display = 'none';
+  _consultorSelecionado = '';
   document.getElementById('poloBusca').value = '';
   _poloSelecionado = '';
   ['hintPolo','hintCandidato','hintDuplicata'].forEach(id => {
@@ -1926,6 +2091,10 @@ async function registrar() {
 
   if (!origemMatricula || !consultor || !candidato || !dataAtendimento || !ticket || !canalAtendimento || !status || !modalidade || !gestor) {
     toastMsg('⚠ Preencha todos os campos obrigatórios.', '#FF5555'); return;
+  }
+  if (!LISTA_CONSULTORES.includes(consultor)) {
+    toastMsg('⚠ Selecione um(a) consultor(a) válido(a) da lista.', '#FF5555');
+    document.getElementById('consultorBusca').style.borderColor = 'var(--vermelho)'; return;
   }
   if ((status === 'Pago na data do vencimento' || status === 'Boleto Pago Antecipado') && !dataPagamento) {
     toastMsg('⚠ Informe a Data do Pagamento.', '#FF5555'); return;
