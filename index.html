@@ -142,6 +142,16 @@ textarea.ctrl { resize: vertical; min-height: 90px; }
 
 .field-hint { display: none; margin-top: 6px; font-size: .8rem; color: var(--vermelho); font-weight: 600; }
 
+/* Badge canal do consultor */
+.canal-badge {
+  display: none; margin-top: 8px;
+  padding: 5px 14px; border-radius: 20px;
+  font-family: 'Nunito', sans-serif; font-weight: 700; font-size: .78rem;
+  width: fit-content;
+}
+.canal-interno { background: rgba(59,130,246,.15); color: #3B82F6; border: 1px solid rgba(59,130,246,.3); }
+.canal-hag     { background: rgba(245,158,11,.15);  color: #F59E0B; border: 1px solid rgba(245,158,11,.3); }
+
 /* ── Footer ── */
 .foot { padding: 0 32px 28px; display: flex; justify-content: flex-end; gap: 12px; }
 .btn {
@@ -278,6 +288,7 @@ textarea.ctrl { resize: vertical; min-height: 90px; }
           <div class="polo-dropdown" id="consultorDropdown"></div>
         </div>
         <input type="hidden" id="consultor">
+        <div id="consultorCanalBadge" class="canal-badge"></div>
       </div>
 
       <div class="group">
@@ -1804,6 +1815,160 @@ function _marcarDuplicata(el) {
 }
 
 // ── Consultor Autocomplete ──
+const CONSULTOR_CANAL = {
+  "Adriano Reder Oliveira": "EFETIVO",
+  "Adriel Wanderlind": "EFETIVO",
+  "Adrielle Letícia Ferreira da Silva de Almeida": "EFETIVO",
+  "Alexia Tainara Taioqui Dos Santos": "HAG",
+  "Allan Karlo De Oliveira": "HAG",
+  "Amanda Cristina Soares": "EFETIVO",
+  "Amanda Das Neves Pacola": "HAG",
+  "Amanda Giraldi Arrozio": "EFETIVO",
+  "Amanda Santin Dolis": "HAG",
+  "Ana Beatriz Oliveira Rosa": "EFETIVO",
+  "Ana Caroline Cartoni Lopes": "HAG",
+  "Ana Lya De Souza Rezende": "HAG",
+  "Andrea Santos Nuevo Galan": "HAG",
+  "Anna Gabryella Nunes": "HAG",
+  "Anna Julia Barbeta De Freitas": "EFETIVO",
+  "Anna Karolina Cardoso Adriano Rosella": "HAG",
+  "Antonio Carlos Milani Nardini": "HAG",
+  "Beatriz Dos Santos Ribeiro": "HAG",
+  "Beatriz Ferrari Jordao": "EFETIVO",
+  "Bianca De Souza Pupin": "HAG",
+  "Bianca Santos Souza": "HAG",
+  "Bruna Aparecida Nogueira": "EFETIVO",
+  "Bruna Cristo Ribeiro": "EFETIVO",
+  "Bruna Martins Dias": "HAG",
+  "Bruna Siena": "HAG",
+  "Bruna Stedile Figueiredo": "EFETIVO",
+  "Camila Melo": "EFETIVO",
+  "Carina Regina Barbosa Pezini": "HAG",
+  "Cassia Leticia Oliveira Soares": "HAG",
+  "Chaiane Conceição Panian Machado": "EFETIVO",
+  "Claudia Azuaga": "HAG",
+  "Claudineia Ferreira Da Silva": "HAG",
+  "Davi Rippi Paié Verissimo De Luna": "HAG",
+  "Deyse de Andrade Landim": "EFETIVO",
+  "Elaine Fernandes Boaventura": "HAG",
+  "Elen Carolina dos Santos": "EFETIVO",
+  "Eli Pereira Primo": "HAG",
+  "Enzo Matteo Sousa De Oliveira": "HAG",
+  "Esdras Santana da Silva": "EFETIVO",
+  "Evelyn Adriana Barbosa Da Silva": "HAG",
+  "Fernanda de Souza Venancio": "EFETIVO",
+  "Flavia Cristina Dos Santos Sousa": "HAG",
+  "Gabriel Casseres Pires": "EFETIVO",
+  "Gabriel Gustavo De Oliveira Silva": "HAG",
+  "Gabriel Kauê Santos Da Silva": "HAG",
+  "Gabriel Rodrigues Alves Pereira": "HAG",
+  "Gabriela Camargo Ribeiro": "EFETIVO",
+  "Gabriela Zalasik": "EFETIVO",
+  "Geovanna Gabriely Rolim de Araujo": "HAG",
+  "Giovana Lauer Linhares": "EFETIVO",
+  "Giovani Henrique Pimenta": "EFETIVO",
+  "Giovanna Victoria dos Santos Macedo Mariano": "HAG",
+  "Gisele Cristina Florentino": "HAG",
+  "Giulia Leite Delli Colli": "EFETIVO",
+  "Gleiciane Do Nascimento Dias": "HAG",
+  "Gustavo Gonçalves Amaro": "EFETIVO",
+  "Gustavo Pivatto Cavalin": "HAG",
+  "Haillany Marinho Da Silva": "HAG",
+  "Helio Gabriel dos Santos": "HAG",
+  "Heloyse Abreu Favacho": "EFETIVO",
+  "Ingrid Aparecida dos Santos Lares da Silva": "EFETIVO",
+  "Ivan Marques Daniel": "EFETIVO",
+  "Izabela Tahisa Alves Procopio": "HAG",
+  "Jaqueline Alves Vicente": "HAG",
+  "Jefferson Andres De Souza Rozas": "HAG",
+  "Jennifer da Silva Mello": "HAG",
+  "Jheniffer do Nascimento Oliveira": "EFETIVO",
+  "Joao Victor Ribeiro de Souza": "EFETIVO",
+  "Joao Vitor Silva Ribeiro": "EFETIVO",
+  "Jonas Alves": "EFETIVO",
+  "Jose Mauro Silva de Paula": "EFETIVO",
+  "Joyce Daya Vieira": "HAG",
+  "João Elias Valero dos Santos": "EFETIVO",
+  "João Pedro Diniz de Assis": "EFETIVO",
+  "Julia Barbosa da Silva": "EFETIVO",
+  "Julia Mantovani Ferro": "EFETIVO",
+  "Juliana Rosa Marinho": "HAG",
+  "Karina Abel Marques": "HAG",
+  "Karlena Crys Ribeiro Da Silva": "HAG",
+  "Kauan Miguel Gomes Da Silva": "HAG",
+  "Kauane Candido da Silva": "EFETIVO",
+  "Kauany Yasmin Vicente Lopes": "HAG",
+  "Kauã Vinícius Muniz Pita": "HAG",
+  "Kawane Alessandra Lourenço Oliveira": "HAG",
+  "Kelly Cristina Do Amaral": "HAG",
+  "Kelly Joeisy de Lima": "EFETIVO",
+  "Larissa Silva Lage": "EFETIVO",
+  "Laura Caethane Nunes Goncalves": "EFETIVO",
+  "Laynara Luvisuto Colli Martins": "EFETIVO",
+  "Leonardo Campelo Ribeiro": "HAG",
+  "Leticia Paiva Gini": "EFETIVO",
+  "Leticia Ramos Nesta": "HAG",
+  "Lidia Venancio Moura": "HAG",
+  "Livia Kaori Matsuda": "EFETIVO",
+  "Lorena Gabrielle Leite Barbosa": "HAG",
+  "Lorraine dos Santos da Costa": "EFETIVO",
+  "Lucas Rodrigues Ueno": "HAG",
+  "Luiz Antonio Tosta Fernandes": "EFETIVO",
+  "Manuela Caetano Soria": "EFETIVO",
+  "Marcelo Martins Filho": "EFETIVO",
+  "Maria Clara Cesar Panhozzi": "EFETIVO",
+  "Maria Eduarda Dos Santos Candido": "HAG",
+  "Maria Eduarda Schamber": "EFETIVO",
+  "Maria Fernanda do Nascimento Justino": "EFETIVO",
+  "Maria Vitoria Marques": "HAG",
+  "Mariana Ferreira Gomes Barbosa": "HAG",
+  "Marina Viana Angelo": "HAG",
+  "Mateus Felipe Gouveia de Souza": "EFETIVO",
+  "Matheus da Costa de Paula": "EFETIVO",
+  "Matheus Rinsi Da Silva": "HAG",
+  "Milena Da Silva Rosa": "HAG",
+  "Murilo Alexandre de Assis": "EFETIVO",
+  "Nathalia de Carvalho Cabral": "EFETIVO",
+  "Nathalia Gagliati Halchuk dos Santos": "EFETIVO",
+  "Nicole da Silva Vicente": "HAG",
+  "Nicole Ribeiro Dos Santos": "EFETIVO",
+  "Patricia Maria Devecchi": "EFETIVO",
+  "Paulo Henrique Ferreira": "EFETIVO",
+  "Paulo Parra Misak": "HAG",
+  "Paulo Ricardo Henrique De Sousa Vital": "EFETIVO",
+  "Pedro Lucas Braga Caetano": "HAG",
+  "Raabe Maristela Moreira Couto Bonfim": "HAG",
+  "Rafaela Rodrigues Mendes": "HAG",
+  "Rodrigo Guido Marcondes": "HAG",
+  "Rodrigo Manhani Rodrigues de Oliveira": "HAG",
+  "Roger Cauã Soares de Freitas": "EFETIVO",
+  "Rosivane Lopes de Aquino": "EFETIVO",
+  "Ruama Rosa Dos Santos Silva": "HAG",
+  "Ryan Guilherme Da Silva Rosa": "HAG",
+  "Samuel Pereira Covre": "EFETIVO",
+  "Sandoval Eduardo Nazareth Souza": "EFETIVO",
+  "Sara Camile Henrique da Silva": "EFETIVO",
+  "Sthefani Cristina fava das Graças Nogueira": "EFETIVO",
+  "Talita Costa Ferreira": "HAG",
+  "Tatiana Cristina Korc": "EFETIVO",
+  "Thaina Telles Benatti": "EFETIVO",
+  "Thaisa Fernanda Tenório da Silveira Fogaça": "EFETIVO",
+  "Thalita Diandra da Silva": "EFETIVO",
+  "Thiago Lima Dos Santos": "HAG",
+  "Thiago Rinsi da Silva": "HAG",
+  "Vanderlei Rodrigues de Souza Junior": "EFETIVO",
+  "Vanessa Lemes Rodrigues": "EFETIVO",
+  "Victor Hugo dos Santos Mucenieks": "EFETIVO",
+  "Virgilia Cabral Pereira": "HAG",
+  "Vitoria De Souza Dias": "HAG",
+  "Viviane Martins De Santana Santos": "HAG",
+  "Wanessa Cristina Martinelli Camargo Da Costa": "HAG",
+  "Wellington Carlos Viana": "EFETIVO",
+  "Yara Vidal de Mattos": "EFETIVO",
+  "Yasmin dos Santos Moraes": "EFETIVO",
+  "Yasmin Rafaella Aparecida Gomes": "EFETIVO",
+};
+
 const LISTA_CONSULTORES = [
   "Adriano Reder Oliveira",
   "Adriel Wanderlind",
@@ -1989,6 +2154,20 @@ function selecionarConsultor(val) {
   document.getElementById('consultor').value = val;
   document.getElementById('consultorDropdown').style.display = 'none';
   document.getElementById('consultorBusca').style.borderColor = '';
+
+  const badge = document.getElementById('consultorCanalBadge');
+  const canal = CONSULTOR_CANAL[val];
+  if (canal === 'EFETIVO') {
+    badge.textContent = '🏢 Atendimento Interno';
+    badge.className = 'canal-badge canal-interno';
+    badge.style.display = 'block';
+  } else if (canal === 'HAG') {
+    badge.textContent = '📞 Atendimento HAG';
+    badge.className = 'canal-badge canal-hag';
+    badge.style.display = 'block';
+  } else {
+    badge.style.display = 'none';
+  }
 }
 
 function navConsultorTeclado(e) {
@@ -2065,6 +2244,7 @@ function limpar() {
   document.getElementById('groupDataPagamento').style.display = 'none';
   document.getElementById('consultorBusca').value = '';
   document.getElementById('consultorDropdown').style.display = 'none';
+  document.getElementById('consultorCanalBadge').style.display = 'none';
   _consultorSelecionado = '';
   document.getElementById('poloBusca').value = '';
   _poloSelecionado = '';
@@ -2128,9 +2308,12 @@ async function registrar() {
   const agora = new Date().toLocaleString('pt-BR');
 
   // Salva no Supabase
+  const canalConsultor = CONSULTOR_CANAL[consultor] === 'HAG' ? 'HAG' : 'Interno';
+
   const { error } = await db.from('matriculas').insert({
     origem_matricula:  origemMatricula,
     consultor,
+    canal_consultor:   canalConsultor,
     candidato,
     data_atendimento:  dataAtendimento,
     ticket,
@@ -2157,8 +2340,8 @@ async function registrar() {
 
   // Backup no localStorage
   const id = dados.length ? Math.max(...dados.map(d => d.id || 0)) + 1 : 1;
-  dados.push({ id, origem_matricula: origemMatricula, consultor, candidato,
-               data_atendimento: dataAtendimento, ticket,
+  dados.push({ id, origem_matricula: origemMatricula, consultor, canal_consultor: canalConsultor,
+               candidato, data_atendimento: dataAtendimento, ticket,
                canal_atendimento: canalAtendimento, status, obs: observacoes,
                polo, modalidade: modalidadeFinal, gestor, registrado_em: agora });
   localStorage.setItem(DADOS_KEY, JSON.stringify(dados));
