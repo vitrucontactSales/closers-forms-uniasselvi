@@ -119,6 +119,22 @@ header {
 .fctrl:focus { outline: none; border-color: var(--amarelo); }
 .fctrl option { background: #2A2A2A; }
 .fctrl[type="date"] { min-width: 130px; }
+
+/* Autocomplete filtro consultor */
+.fac-wrap { position: relative; }
+.fac-dropdown {
+  display: none; position: absolute; top: calc(100% + 3px); left: 0; right: 0;
+  background: var(--card2); border: 1.5px solid var(--amarelo); border-radius: 8px;
+  max-height: 200px; overflow-y: auto; z-index: 300;
+  box-shadow: 0 8px 24px rgba(0,0,0,.5); min-width: 220px;
+}
+.fac-item {
+  padding: 8px 14px; cursor: pointer; font-size: .82rem; color: var(--txt);
+  border-bottom: 1px solid var(--borda); transition: background .1s;
+}
+.fac-item:last-child { border-bottom: none; }
+.fac-item:hover, .fac-item.ativo { background: #1C1800; color: var(--amarelo); font-weight: 700; }
+.fac-nenhum { padding: 10px 14px; font-size: .8rem; color: var(--txt3); text-align: center; }
 .btn-reset {
   padding: 9px 16px; border-radius: 8px;
   border: 1.5px solid var(--borda-f); background: transparent;
@@ -130,10 +146,11 @@ header {
 
 /* ── Charts ── */
 .charts-grid {
-  display: grid; grid-template-columns: 2fr 1fr;
+  display: grid; grid-template-columns: 2fr 1fr 1fr;
   gap: 16px; margin-bottom: 24px;
 }
-@media(max-width:800px) { .charts-grid { grid-template-columns: 1fr; } }
+@media(max-width:1000px) { .charts-grid { grid-template-columns: 1fr 1fr; } }
+@media(max-width:600px)  { .charts-grid { grid-template-columns: 1fr; } }
 
 .chart-card {
   background: var(--card); border: 1px solid var(--borda);
@@ -176,6 +193,9 @@ tbody td { padding: 9px 14px; color: var(--txt); vertical-align: middle; white-s
 .td-num { color: var(--txt3); font-size: .76rem; }
 .td-candidato { font-family: 'Nunito', sans-serif; font-weight: 700; }
 .td-dim { color: var(--txt2); }
+.canal-tipo { padding: 3px 10px; border-radius: 12px; font-size: .72rem; font-weight: 700; font-family: 'Nunito', sans-serif; white-space: nowrap; }
+.ct-interno { background: rgba(59,130,246,.15); color: #3B82F6; }
+.ct-hag     { background: rgba(245,158,11,.15);  color: #F59E0B; }
 .td-ts { color: var(--txt3); font-size: .74rem; }
 
 /* ── Status select inline ── */
@@ -286,9 +306,17 @@ tbody td { padding: 9px 14px; color: var(--txt); vertical-align: middle; white-s
     </div>
     <div class="fg">
       <label>Consultor(a)</label>
-      <select class="fctrl" id="fConsultor" onchange="aplicarFiltros()">
-        <option value="">Todos</option>
-      </select>
+      <div class="fac-wrap">
+        <input class="fctrl" type="text" id="fConsultorBusca"
+               placeholder="Buscar consultor..."
+               autocomplete="off"
+               oninput="filtrarFConsultor()"
+               onfocus="abrirFConsultor()"
+               onkeydown="navFConsultor(event)"
+               style="padding-right:10px">
+        <div class="fac-dropdown" id="fConsultorDrop"></div>
+      </div>
+      <input type="hidden" id="fConsultor">
     </div>
     <div class="fg">
       <label>Status</label>
@@ -336,6 +364,10 @@ tbody td { padding: 9px 14px; color: var(--txt); vertical-align: middle; white-s
       <div class="chart-wrap"><canvas id="chartConsultor"></canvas></div>
     </div>
     <div class="chart-card">
+      <div class="chart-title">Interno vs HAG</div>
+      <div class="chart-wrap"><canvas id="chartCanal"></canvas></div>
+    </div>
+    <div class="chart-card">
       <div class="chart-title">Distribuição por Status</div>
       <div class="chart-wrap"><canvas id="chartStatus"></canvas></div>
     </div>
@@ -353,6 +385,7 @@ tbody td { padding: 9px 14px; color: var(--txt); vertical-align: middle; white-s
           <tr>
             <th>#</th>
             <th>Consultor(a)</th>
+            <th>Tipo</th>
             <th>Candidato</th>
             <th>Data Atend.</th>
             <th>Ticket</th>
@@ -367,7 +400,7 @@ tbody td { padding: 9px 14px; color: var(--txt); vertical-align: middle; white-s
           </tr>
         </thead>
         <tbody id="tbody">
-          <tr><td colspan="13" class="msg-estado">Carregando dados...</td></tr>
+          <tr><td colspan="14" class="msg-estado">Carregando dados...</td></tr>
         </tbody>
       </table>
     </div>
@@ -393,6 +426,7 @@ if (sessionStorage.getItem('dash_auth') !== '1') {
 let todosRegistros   = [];
 let chartConsulInst  = null;
 let chartStatusInst  = null;
+let chartCanalInst   = null;
 
 // ── Toast ──
 function toast(msg, cor = '#2ECC71') {
@@ -459,7 +493,7 @@ async function carregar() {
 
   if (error) {
     document.getElementById('tbody').innerHTML =
-      `<tr><td colspan="13" class="msg-estado">❌ Erro ao carregar dados. Verifique a conexão.</td></tr>`;
+      `<tr><td colspan="14" class="msg-estado">❌ Erro ao carregar dados. Verifique a conexão.</td></tr>`;
     return;
   }
 
@@ -468,16 +502,61 @@ async function carregar() {
   aplicarFiltros();
 }
 
-// ── Popular select de consultores ──
+// ── Autocomplete filtro consultor ──
+let _fConsultorNomes = [];
+let _fConsultorAtivo = -1;
+
 function popularFiltroConsultor() {
-  const sel = document.getElementById('fConsultor');
-  const nomes = [...new Set(todosRegistros.map(r => r.consultor).filter(Boolean))]
+  _fConsultorNomes = [...new Set(todosRegistros.map(r => r.consultor).filter(Boolean))]
     .sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  // legado — mantido para não quebrar chamadas existentes
+  const sel = { appendChild: () => {} }; // no-op
+  const nomes = _fConsultorNomes;
   nomes.forEach(n => {
     const o = document.createElement('option');
     o.value = o.textContent = n;
     sel.appendChild(o);
   });
+}
+
+function filtrarFConsultor() {
+  document.getElementById('fConsultor').value = '';
+  const q    = document.getElementById('fConsultorBusca').value.toLowerCase().trim();
+  const drop = document.getElementById('fConsultorDrop');
+  _fConsultorAtivo = -1;
+  if (!q) { drop.style.display = 'none'; aplicarFiltros(); return; }
+  const matches = _fConsultorNomes.filter(n => n.toLowerCase().includes(q));
+  drop.innerHTML = matches.length
+    ? matches.map(n => `<div class="fac-item" onclick="selecionarFConsultor('${n.replace(/'/g,"\\'")}') ">${n}</div>`).join('')
+    : '<div class="fac-nenhum">Nenhum resultado.</div>';
+  drop.style.display = 'block';
+}
+
+function abrirFConsultor() {
+  if (document.getElementById('fConsultorBusca').value.trim()) filtrarFConsultor();
+}
+
+function selecionarFConsultor(val) {
+  document.getElementById('fConsultorBusca').value = val;
+  document.getElementById('fConsultor').value = val;
+  document.getElementById('fConsultorDrop').style.display = 'none';
+  aplicarFiltros();
+}
+
+function navFConsultor(e) {
+  const items = document.querySelectorAll('#fConsultorDrop .fac-item');
+  if (!items.length) return;
+  if (e.key === 'ArrowDown') _fConsultorAtivo = Math.min(_fConsultorAtivo + 1, items.length - 1);
+  else if (e.key === 'ArrowUp') _fConsultorAtivo = Math.max(_fConsultorAtivo - 1, 0);
+  else if (e.key === 'Enter' && _fConsultorAtivo >= 0) {
+    e.preventDefault();
+    selecionarFConsultor(items[_fConsultorAtivo].textContent.trim());
+    return;
+  } else if (e.key === 'Escape') {
+    document.getElementById('fConsultorDrop').style.display = 'none'; return;
+  } else return;
+  items.forEach((el, i) => el.classList.toggle('ativo', i === _fConsultorAtivo));
+  items[_fConsultorAtivo]?.scrollIntoView({ block: 'nearest' });
 }
 
 // ── Filtros ──
@@ -528,8 +607,11 @@ async function atualizarDataPagamento(input) {
 }
 
 function limparFiltros() {
-  ['fGestor','fConsultor','fStatus','fCanal','fModalidade','fDe','fAte']
+  ['fGestor','fStatus','fCanal','fModalidade','fDe','fAte']
     .forEach(id => document.getElementById(id).value = '');
+  document.getElementById('fConsultor').value      = '';
+  document.getElementById('fConsultorBusca').value = '';
+  document.getElementById('fConsultorDrop').style.display = 'none';
   aplicarFiltros();
 }
 
@@ -601,6 +683,31 @@ function atualizarGraficos(d) {
       }
     }
   });
+
+  // Interno vs HAG
+  const interno = d.filter(r => r.canal_consultor === 'Interno' || (!r.canal_consultor && r.canal_atendimento === 'Interno')).length;
+  const hag     = d.filter(r => r.canal_consultor === 'HAG'     || (!r.canal_consultor && r.canal_atendimento === 'Hag')).length;
+  if (chartCanalInst) chartCanalInst.destroy();
+  chartCanalInst = new Chart(document.getElementById('chartCanal'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Interno', 'HAG'],
+      datasets: [{
+        data: [interno, hag],
+        backgroundColor: ['#3B82F6', '#F59E0B'],
+        borderColor: '#1A1A1A', borderWidth: 3, hoverOffset: 6
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '62%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { color: '#bbb', padding: 14, font: { size: 11 }, boxWidth: 12 }
+        }
+      }
+    }
+  });
 }
 
 // ── Tabela ──
@@ -610,7 +717,7 @@ function renderTabela(d) {
     `${d.length} registro${d.length !== 1 ? 's' : ''}`;
 
   if (!d.length) {
-    tbody.innerHTML = `<tr><td colspan="13" class="msg-estado">Nenhum registro encontrado.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="14" class="msg-estado">Nenhum registro encontrado.</td></tr>`;
     return;
   }
 
@@ -618,6 +725,7 @@ function renderTabela(d) {
     <tr>
       <td class="td-num">${i + 1}</td>
       <td>${r.consultor || '—'}</td>
+      <td><span class="canal-tipo ${r.canal_consultor === 'HAG' ? 'ct-hag' : 'ct-interno'}">${r.canal_consultor || '—'}</span></td>
       <td class="td-candidato">${r.candidato || '—'}</td>
       <td>${fmtData(r.data_atendimento)}</td>
       <td class="td-dim">${r.ticket || '—'}</td>
@@ -764,8 +872,8 @@ function exportarCSV() {
   const filtrado = getFiltrado();
   if (!filtrado.length) { toast('Nenhum dado para exportar.', '#F59E0B'); return; }
 
-  const cols = ['consultor','candidato','data_atendimento','ticket','canal_atendimento','polo','modalidade','gestor','status','data_pagamento','observacoes','registrado_em'];
-  const cabecalho = ['Consultor','Candidato','Data Atendimento','Ticket','Canal','Polo','Modalidade','Gestor','Status','Data Pagamento','Observações','Registrado Em'];
+  const cols = ['origem_matricula','consultor','canal_consultor','candidato','data_atendimento','ticket','canal_atendimento','polo','modalidade','gestor','status','data_pagamento','observacoes','status_auditoria','obs_auditoria','registrado_em'];
+  const cabecalho = ['Origem','Consultor','Tipo Consultor','Candidato','Data Atendimento','Ticket','Canal Atendimento','Polo','Modalidade','Gestor','Status','Data Pagamento','Observações','Auditoria','Obs. Auditoria','Registrado Em'];
 
   const linhas = filtrado.map(r =>
     cols.map(c => `"${String(r[c] || '').replace(/"/g, '""')}"`).join(',')
