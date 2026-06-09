@@ -385,7 +385,6 @@ tbody td { padding: 9px 14px; color: var(--txt); vertical-align: middle; white-s
           <tr>
             <th>#</th>
             <th>Consultor(a)</th>
-            <th>Tipo</th>
             <th>Candidato</th>
             <th>Data Atend.</th>
             <th>Ticket</th>
@@ -400,7 +399,7 @@ tbody td { padding: 9px 14px; color: var(--txt); vertical-align: middle; white-s
           </tr>
         </thead>
         <tbody id="tbody">
-          <tr><td colspan="14" class="msg-estado">Carregando dados...</td></tr>
+          <tr><td colspan="13" class="msg-estado">Carregando dados...</td></tr>
         </tbody>
       </table>
     </div>
@@ -493,7 +492,7 @@ async function carregar() {
 
   if (error) {
     document.getElementById('tbody').innerHTML =
-      `<tr><td colspan="14" class="msg-estado">❌ Erro ao carregar dados. Verifique a conexão.</td></tr>`;
+      `<tr><td colspan="13" class="msg-estado">❌ Erro ao carregar dados. Verifique a conexão.</td></tr>`;
     return;
   }
 
@@ -717,7 +716,7 @@ function renderTabela(d) {
     `${d.length} registro${d.length !== 1 ? 's' : ''}`;
 
   if (!d.length) {
-    tbody.innerHTML = `<tr><td colspan="14" class="msg-estado">Nenhum registro encontrado.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="13" class="msg-estado">Nenhum registro encontrado.</td></tr>`;
     return;
   }
 
@@ -725,7 +724,6 @@ function renderTabela(d) {
     <tr>
       <td class="td-num">${i + 1}</td>
       <td>${r.consultor || '—'}</td>
-      <td><span class="canal-tipo ${r.canal_consultor === 'HAG' ? 'ct-hag' : 'ct-interno'}">${r.canal_consultor || '—'}</span></td>
       <td class="td-candidato">${r.candidato || '—'}</td>
       <td>${fmtData(r.data_atendimento)}</td>
       <td class="td-dim">${r.ticket || '—'}</td>
