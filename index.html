@@ -316,19 +316,9 @@ textarea.ctrl { resize: vertical; min-height: 90px; }
         <input class="ctrl" type="text" id="ticket" placeholder="Ex.: TKT-12345" required autocomplete="off">
       </div>
 
-      <div class="group">
-        <label class="label"><span class="num">6</span> Canal de Atendimento <span class="req">*</span></label>
-        <div class="sw">
-          <select class="ctrl" id="canalAtendimento" required>
-            <option value="">Selecione o Canal</option>
-            <option value="Interno">Interno</option>
-            <option value="Hag">Hag</option>
-          </select>
-        </div>
-      </div>
 
       <div class="group">
-        <label class="label"><span class="num">7</span> Modalidade de Curso <span class="req">*</span></label>
+        <label class="label"><span class="num">6</span> Modalidade de Curso <span class="req">*</span></label>
         <div class="sw">
           <select class="ctrl" id="modalidade" onchange="onModalidadeChange()" required>
             <option value="Graduação EAD">Graduação EAD</option>
@@ -352,7 +342,7 @@ textarea.ctrl { resize: vertical; min-height: 90px; }
       </div>
 
       <div class="group">
-        <label class="label"><span class="num">8</span> Gestor(a) <span class="req">*</span></label>
+        <label class="label"><span class="num">7</span> Gestor(a) <span class="req">*</span></label>
         <div class="sw">
           <select class="ctrl" id="gestor" required>
             <option value="">Selecione o(a) Gestor(a)</option>
@@ -363,7 +353,7 @@ textarea.ctrl { resize: vertical; min-height: 90px; }
       </div>
 
       <div class="group">
-        <label class="label"><span class="num">9</span> Polo <span class="req">*</span></label>
+        <label class="label"><span class="num">8</span> Polo <span class="req">*</span></label>
         <div class="sw polo-wrap">
           <input class="ctrl" type="text" id="poloBusca"
                  placeholder="Digite o nome da cidade ou polo..."
@@ -1611,7 +1601,7 @@ textarea.ctrl { resize: vertical; min-height: 90px; }
       </div>
 
       <div class="group">
-        <label class="label"><span class="num">10</span> Status <span class="req">*</span></label>
+        <label class="label"><span class="num">9</span> Status <span class="req">*</span></label>
         <div class="sw">
           <select class="ctrl" id="status" onchange="onStatusChange()" required>
             <option value="">Selecione o Status</option>
@@ -1630,7 +1620,7 @@ textarea.ctrl { resize: vertical; min-height: 90px; }
       </div>
 
       <div class="group">
-        <label class="label"><span class="num">11</span> Observações</label>
+        <label class="label"><span class="num">10</span> Observações</label>
         <textarea class="ctrl" id="observacoes" placeholder="Observações relevantes sobre a matrícula..."></textarea>
       </div>
 
@@ -2238,7 +2228,7 @@ document.addEventListener('click', e => {
 
 // ── Limpar ──
 function limpar() {
-  ['consultor','candidato','dataAtendimento','ticket','canalAtendimento','status','dataPagamento','observacoes','modalidade','subModalidade','gestor','polo']
+  ['consultor','candidato','dataAtendimento','ticket','status','dataPagamento','observacoes','modalidade','subModalidade','gestor','polo']
     .forEach(id => { document.getElementById(id).value = ''; });
   document.getElementById('groupSubModalidade').style.display = 'none';
   document.getElementById('groupDataPagamento').style.display = 'none';
@@ -2261,7 +2251,6 @@ async function registrar() {
   const candidato         = document.getElementById('candidato').value.trim();
   const dataAtendimento   = document.getElementById('dataAtendimento').value;
   const ticket            = document.getElementById('ticket').value.trim();
-  const canalAtendimento  = document.getElementById('canalAtendimento').value;
   const status            = document.getElementById('status').value;
   const dataPagamento     = document.getElementById('dataPagamento').value;
   const observacoes       = document.getElementById('observacoes').value.trim();
@@ -2269,7 +2258,7 @@ async function registrar() {
   const polo              = document.getElementById('polo').value;
   const gestor            = document.getElementById('gestor').value;
 
-  if (!origemMatricula || !consultor || !candidato || !dataAtendimento || !ticket || !canalAtendimento || !status || !modalidade || !gestor) {
+  if (!origemMatricula || !consultor || !candidato || !dataAtendimento || !ticket || !status || !modalidade || !gestor) {
     toastMsg('⚠ Preencha todos os campos obrigatórios.', '#FF5555'); return;
   }
   if (!LISTA_CONSULTORES.includes(consultor)) {
@@ -2308,7 +2297,8 @@ async function registrar() {
   const agora = new Date().toLocaleString('pt-BR');
 
   // Salva no Supabase
-  const canalConsultor = CONSULTOR_CANAL[consultor] === 'HAG' ? 'HAG' : 'Interno';
+  const canalConsultor  = CONSULTOR_CANAL[consultor] === 'HAG' ? 'HAG' : 'Interno';
+  const canalAtendimento = canalConsultor === 'HAG' ? 'Hag' : 'Interno';
 
   const { error } = await db.from('matriculas').insert({
     origem_matricula:  origemMatricula,
