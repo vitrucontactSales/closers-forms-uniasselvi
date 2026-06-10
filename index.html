@@ -1668,6 +1668,8 @@ textarea.ctrl { resize: vertical; min-height: 90px; }
         <label class="colab-label">Gestor Imediato *</label>
         <select class="colab-input" id="colabGestor">
           <option value="">Selecione o Gestor</option>
+          <option value="Beatriz Ferrari Jordão">Beatriz Ferrari Jordão</option>
+          <option value="Sandoval Eduardo Nazareth Souza">Sandoval Eduardo Nazareth Souza</option>
         </select>
       </div>
       <div class="colab-group">
@@ -1678,6 +1680,8 @@ textarea.ctrl { resize: vertical; min-height: 90px; }
         <label class="colab-label">Canal de Atendimento *</label>
         <select class="colab-input" id="colabCanal">
           <option value="">Selecione</option>
+          <option value="EFETIVO">Interno (EFETIVO)</option>
+          <option value="HAG">HAG</option>
         </select>
       </div>
     </div>
@@ -2418,7 +2422,7 @@ async function cadastrarColaborador() {
     return;
   }
 
-  adicionarConsultorSelect(nome);
+  adicionarConsultorLista(nome, canal);
   fecharModalColab();
   toastMsg('✔ Colaborador cadastrado com sucesso!');
   btn.disabled = false; btn.textContent = '✔ Cadastrar';
@@ -2426,22 +2430,20 @@ async function cadastrarColaborador() {
 
 async function carregarConsultores() {
   try {
-    const { data } = await db.from('colaboradores').select('nome').order('nome');
-    if (data) data.forEach(c => adicionarConsultorSelect(c.nome));
+    const { data } = await db.from('colaboradores').select('nome, canal').order('nome');
+    if (data) data.forEach(c => adicionarConsultorLista(c.nome, c.canal));
   } catch (_) {}
 }
 
-function adicionarConsultorSelect(nome) {
-  const select = document.getElementById('consultor');
-  if (Array.from(select.options).some(o => o.value === nome)) return;
-  const opt = document.createElement('option');
-  opt.value = nome; opt.textContent = nome;
-  const opcoes = Array.from(select.options).slice(1);
-  const pos = opcoes.findIndex(o => o.value.localeCompare(nome, 'pt-BR') > 0);
-  if (pos === -1) select.appendChild(opt);
-  else select.options[pos + 1].before(opt);
+function adicionarConsultorLista(nome, canal) {
+  if (!nome) return;
+  if (!LISTA_CONSULTORES.includes(nome)) {
+    LISTA_CONSULTORES.push(nome);
+    LISTA_CONSULTORES.sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  }
+  CONSULTOR_CANAL[nome] = canal || 'EFETIVO';
 }
-// Carrega consultores cadastrados ao abrir o formulário
+// Carrega consultores cadastrados no Supabase ao abrir o formulário
 carregarConsultores();
 </script>
 </body>
