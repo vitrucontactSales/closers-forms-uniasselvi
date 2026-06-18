@@ -26,7 +26,8 @@
   --r:         12px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Nunito Sans', sans-serif; background: var(--bg); min-height: 100vh; color: var(--txt); }
+html { overflow-x: hidden; max-width: 100vw; }
+body { font-family: 'Nunito Sans', sans-serif; background: var(--bg); min-height: 100vh; color: var(--txt); overflow-x: hidden; max-width: 100vw; }
 
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--card); }
@@ -60,7 +61,19 @@ header {
 .nav-btn.ghost:hover { border-color: var(--amarelo); color: var(--amarelo); background: var(--amarelo-g); transform: none; }
 
 /* ── Layout ── */
-.wrapper { max-width: 1440px; margin: 0 auto; padding: 28px 24px 60px; }
+.wrapper { max-width: 1440px; width: 100%; margin: 0 auto; padding: 28px 24px 60px; }
+
+.update-bar {
+  display: flex; align-items: center; justify-content: flex-end; gap: 12px;
+  margin-bottom: 16px; font-size: .78rem; color: var(--txt2);
+}
+.btn-atualizar {
+  background: transparent; border: 1px solid var(--borda-f); color: var(--txt);
+  padding: 5px 14px; border-radius: 8px; cursor: pointer; font-size: .78rem;
+  font-family: 'Nunito Sans', sans-serif; transition: border-color .2s, color .2s;
+}
+.btn-atualizar:hover { border-color: var(--amarelo); color: var(--amarelo); }
+.btn-atualizar.loading { opacity: .5; pointer-events: none; }
 
 /* ── KPI Cards ── */
 .kpi-grid {
@@ -146,7 +159,7 @@ header {
 
 /* ── Charts ── */
 .charts-grid {
-  display: grid; grid-template-columns: 2fr 1fr 1fr;
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
   gap: 16px; margin-bottom: 24px;
 }
 @media(max-width:1000px) { .charts-grid { grid-template-columns: 1fr 1fr; } }
@@ -166,7 +179,7 @@ header {
 /* ── Table ── */
 .table-card {
   background: var(--card); border: 1px solid var(--borda);
-  border-radius: var(--r); overflow: hidden;
+  border-radius: var(--r); overflow: hidden; min-width: 0; width: 100%;
 }
 .table-head {
   padding: 14px 20px; border-bottom: 1px solid var(--borda);
@@ -218,6 +231,7 @@ tbody td { padding: 9px 14px; color: var(--txt); vertical-align: middle; white-s
 
 /* ── Auditoria ── */
 .ssel-audit { min-width: 160px; }
+.ssel-origem { min-width: 130px; background-color: rgba(255,255,255,.05); }
 .s-audit-ok   { background: rgba(46,204,113,.15); color: #2ECC71; }
 .s-audit-erro { background: rgba(255,85,85,.15);  color: #FF5555; }
 .s-audit-pend { background: rgba(100,100,100,.15); color: #888; }
@@ -270,11 +284,17 @@ tbody td { padding: 9px 14px; color: var(--txt); vertical-align: middle; white-s
 
 <div class="wrapper">
 
+  <!-- Barra de atualização -->
+  <div class="update-bar">
+    <span id="ultimaAtualizacao">Carregando...</span>
+    <button class="btn-atualizar" id="btnAtualizar" onclick="atualizarDados()">↻ Atualizar</button>
+  </div>
+
   <!-- KPIs -->
   <div class="kpi-grid">
     <div class="kpi-card k-total">
       <span class="kpi-icon">📋</span>
-      <div class="kpi-label">Total de Matrículas</div>
+      <div class="kpi-label">Atuação de Boleto</div>
       <div class="kpi-value" id="kpiTotal">—</div>
     </div>
     <div class="kpi-card k-pago">
@@ -347,6 +367,14 @@ tbody td { padding: 9px 14px; color: var(--txt); vertical-align: middle; white-s
       </select>
     </div>
     <div class="fg">
+      <label>Origem</label>
+      <select class="fctrl" id="fOrigem" onchange="aplicarFiltros()">
+        <option value="">Todas</option>
+        <option>Contact Center</option>
+        <option>Leo App/Web</option>
+      </select>
+    </div>
+    <div class="fg">
       <label>De</label>
       <input type="date" class="fctrl" id="fDe" onchange="aplicarFiltros()">
     </div>
@@ -371,6 +399,10 @@ tbody td { padding: 9px 14px; color: var(--txt); vertical-align: middle; white-s
       <div class="chart-title">Distribuição por Status</div>
       <div class="chart-wrap"><canvas id="chartStatus"></canvas></div>
     </div>
+    <div class="chart-card">
+      <div class="chart-title">Origem da Matrícula</div>
+      <div class="chart-wrap"><canvas id="chartOrigem"></canvas></div>
+    </div>
   </div>
 
   <!-- Tabela -->
@@ -385,6 +417,7 @@ tbody td { padding: 9px 14px; color: var(--txt); vertical-align: middle; white-s
           <tr>
             <th>#</th>
             <th>Consultor(a)</th>
+            <th>Origem</th>
             <th>Candidato</th>
             <th>Data Atend.</th>
             <th>Ticket</th>
@@ -399,7 +432,7 @@ tbody td { padding: 9px 14px; color: var(--txt); vertical-align: middle; white-s
           </tr>
         </thead>
         <tbody id="tbody">
-          <tr><td colspan="13" class="msg-estado">Carregando dados...</td></tr>
+          <tr><td colspan="14" class="msg-estado">Carregando dados...</td></tr>
         </tbody>
       </table>
     </div>
@@ -411,11 +444,29 @@ tbody td { padding: 9px 14px; color: var(--txt); vertical-align: middle; white-s
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 <script>
+Chart.register(ChartDataLabels);
+
 const SUPABASE_URL  = 'https://wfequjtoutpqvfyjdrvo.supabase.co';
 const SUPABASE_KEY  = 'sb_publishable_NYXnlMO9SZc4Sg3zxPCZtw_Uto0gecQ';
 
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+function doughnutDatalabels(dataArr) {
+  const total = dataArr.reduce((s, v) => s + v, 0);
+  return {
+    color: '#fff',
+    font: { weight: 'bold', size: 12 },
+    textAlign: 'center',
+    formatter: (value) => {
+      if (!value) return '';
+      const pct = total ? Math.round(value / total * 100) : 0;
+      return `${value}\n(${pct}%)`;
+    },
+    display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0
+  };
+}
 
 // Proteção de acesso
 if (sessionStorage.getItem('dash_auth') !== '1') {
@@ -426,6 +477,7 @@ let todosRegistros   = [];
 let chartConsulInst  = null;
 let chartStatusInst  = null;
 let chartCanalInst   = null;
+let chartOrigemInst  = null;
 
 // ── Toast ──
 function toast(msg, cor = '#2ECC71') {
@@ -492,13 +544,25 @@ async function carregar() {
 
   if (error) {
     document.getElementById('tbody').innerHTML =
-      `<tr><td colspan="13" class="msg-estado">❌ Erro ao carregar dados. Verifique a conexão.</td></tr>`;
+      `<tr><td colspan="14" class="msg-estado">❌ Erro ao carregar dados. Verifique a conexão.</td></tr>`;
     return;
   }
 
   todosRegistros = data || [];
   popularFiltroConsultor();
   aplicarFiltros();
+
+  const agora = new Date().toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+  document.getElementById('ultimaAtualizacao').textContent = `Última atualização: ${agora}`;
+}
+
+async function atualizarDados() {
+  const btn = document.getElementById('btnAtualizar');
+  btn.textContent = '↻ Atualizando...';
+  btn.classList.add('loading');
+  await carregar();
+  btn.textContent = '↻ Atualizar';
+  btn.classList.remove('loading');
 }
 
 // ── Autocomplete filtro consultor ──
@@ -560,13 +624,14 @@ function navFConsultor(e) {
 
 // ── Filtros ──
 function getFiltrado() {
-  const fG = document.getElementById('fGestor').value;
-  const fC = document.getElementById('fConsultor').value;
-  const fS = document.getElementById('fStatus').value;
-  const fCa= document.getElementById('fCanal').value;
-  const fM = document.getElementById('fModalidade').value;
-  const fDe= document.getElementById('fDe').value;
-  const fAt= document.getElementById('fAte').value;
+  const fG  = document.getElementById('fGestor').value;
+  const fC  = document.getElementById('fConsultor').value;
+  const fS  = document.getElementById('fStatus').value;
+  const fCa = document.getElementById('fCanal').value;
+  const fM  = document.getElementById('fModalidade').value;
+  const fOr = document.getElementById('fOrigem').value;
+  const fDe = document.getElementById('fDe').value;
+  const fAt = document.getElementById('fAte').value;
 
   return todosRegistros.filter(r => {
     if (fG  && r.gestor            !== fG)  return false;
@@ -574,6 +639,7 @@ function getFiltrado() {
     if (fS  && r.status            !== fS)  return false;
     if (fCa && r.canal_atendimento !== fCa) return false;
     if (fM  && r.modalidade        !== fM)  return false;
+    if (fOr && r.origem_matricula  !== fOr) return false;
     if (fDe && r.data_atendimento  <  fDe)  return false;
     if (fAt && r.data_atendimento  >  fAt)  return false;
     return true;
@@ -606,7 +672,7 @@ async function atualizarDataPagamento(input) {
 }
 
 function limparFiltros() {
-  ['fGestor','fStatus','fCanal','fModalidade','fDe','fAte']
+  ['fGestor','fStatus','fCanal','fModalidade','fOrigem','fDe','fAte']
     .forEach(id => document.getElementById(id).value = '');
   document.getElementById('fConsultor').value      = '';
   document.getElementById('fConsultorBusca').value = '';
@@ -646,7 +712,7 @@ function atualizarGraficos(d) {
     },
     options: {
       indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
+      plugins: { legend: { display: false }, datalabels: { display: false } },
       scales: {
         x: { ticks: { color: '#666', font: { size: 11 } }, grid: { color: '#222' } },
         y: { ticks: { color: '#bbb', font: { size: 11 } }, grid: { display: false } }
@@ -678,7 +744,8 @@ function atualizarGraficos(d) {
         legend: {
           position: 'bottom',
           labels: { color: '#bbb', padding: 14, font: { size: 11 }, boxWidth: 12 }
-        }
+        },
+        datalabels: doughnutDatalabels(sData)
       }
     }
   });
@@ -703,7 +770,34 @@ function atualizarGraficos(d) {
         legend: {
           position: 'bottom',
           labels: { color: '#bbb', padding: 14, font: { size: 11 }, boxWidth: 12 }
-        }
+        },
+        datalabels: doughnutDatalabels([interno, hag])
+      }
+    }
+  });
+
+  const cc  = d.filter(r => r.origem_matricula === 'Contact Center').length;
+  const leo = d.filter(r => r.origem_matricula === 'Leo App/Web').length;
+
+  if (chartOrigemInst) chartOrigemInst.destroy();
+  chartOrigemInst = new Chart(document.getElementById('chartOrigem'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Contact Center', 'Leo App/Web'],
+      datasets: [{
+        data: [cc, leo],
+        backgroundColor: ['#10B981', '#8B5CF6'],
+        borderColor: '#1A1A1A', borderWidth: 3, hoverOffset: 6
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '62%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { color: '#bbb', padding: 14, font: { size: 11 }, boxWidth: 12 }
+        },
+        datalabels: doughnutDatalabels([cc, leo])
       }
     }
   });
@@ -716,7 +810,7 @@ function renderTabela(d) {
     `${d.length} registro${d.length !== 1 ? 's' : ''}`;
 
   if (!d.length) {
-    tbody.innerHTML = `<tr><td colspan="13" class="msg-estado">Nenhum registro encontrado.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="14" class="msg-estado">Nenhum registro encontrado.</td></tr>`;
     return;
   }
 
@@ -724,6 +818,16 @@ function renderTabela(d) {
     <tr>
       <td class="td-num">${i + 1}</td>
       <td>${r.consultor || '—'}</td>
+      <td>
+        <select class="ssel ssel-origem"
+                data-id="${r.id}"
+                data-orig="${r.origem_matricula || ''}"
+                onchange="atualizarOrigem(this)">
+          <option value="" ${!r.origem_matricula ? 'selected' : ''}>—</option>
+          <option value="Contact Center" ${r.origem_matricula === 'Contact Center' ? 'selected' : ''}>Contact Center</option>
+          <option value="Leo App/Web" ${r.origem_matricula === 'Leo App/Web' ? 'selected' : ''}>Leo App/Web</option>
+        </select>
+      </td>
       <td class="td-candidato">${r.candidato || '—'}</td>
       <td>${fmtData(r.data_atendimento)}</td>
       <td class="td-dim">${r.ticket || '—'}</td>
@@ -808,6 +912,38 @@ async function atualizarStatus(sel) {
   atualizarGraficos(filtrado);
 
   toast('✔ Status atualizado!');
+}
+
+// ── Origem editável ──
+async function atualizarOrigem(sel) {
+  const id       = sel.dataset.id;
+  const novaOrigem = sel.value;
+  const original = sel.dataset.orig;
+
+  sel.disabled = true;
+
+  const { error } = await db
+    .from('matriculas')
+    .update({ origem_matricula: novaOrigem || null })
+    .eq('id', id);
+
+  sel.disabled = false;
+
+  if (error) {
+    sel.value = original;
+    toast('Erro ao atualizar origem.', '#FF5555');
+    return;
+  }
+
+  const reg = todosRegistros.find(r => r.id === id);
+  if (reg) reg.origem_matricula = novaOrigem;
+  sel.dataset.orig = novaOrigem;
+
+  const filtrado = getFiltrado();
+  atualizarKPIs(filtrado);
+  atualizarGraficos(filtrado);
+
+  toast('✔ Origem atualizada!');
 }
 
 // ── Auditoria ──
