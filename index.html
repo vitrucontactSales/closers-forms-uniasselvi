@@ -1714,10 +1714,15 @@ textarea.ctrl { resize: vertical; min-height: 90px; }
 <script>
 const SUPABASE_URL  = 'https://wfequjtoutpqvfyjdrvo.supabase.co';
 const SUPABASE_KEY  = 'sb_publishable_NYXnlMO9SZc4Sg3zxPCZtw_Uto0gecQ';
-const SENHA_SISTEMA = 'Closer@2026';
+const SENHA_HASH    = '444d3cd07375316788bc9fcbbd211ce93c593ac06ff7177cf96ce80fa236410a';
 const DADOS_KEY     = 'uniasselvi_closers_v1';
 
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function hashSenha(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
 
 // ── Toast ──
 function toastMsg(msg, cor = '#2ECC71') {
@@ -2360,8 +2365,9 @@ function abrirDashboard() {
   setTimeout(() => document.getElementById('inputSenha').focus(), 100);
 }
 function fecharModal() { document.getElementById('modalSenha').classList.remove('show'); }
-function verificarSenha() {
-  if (document.getElementById('inputSenha').value === SENHA_SISTEMA) {
+async function verificarSenha() {
+  const h = await hashSenha(document.getElementById('inputSenha').value);
+  if (h === SENHA_HASH) {
     sessionStorage.setItem('dash_auth', '1');
     window.location.href = 'dashboard.html';
   } else {
@@ -2379,8 +2385,9 @@ function abrirCadastroGestor() {
   setTimeout(() => document.getElementById('inputSenhaGestor').focus(), 100);
 }
 function fecharModalGestor() { document.getElementById('modalSenhaGestor').classList.remove('show'); }
-function verificarSenhaGestor() {
-  if (document.getElementById('inputSenhaGestor').value === SENHA_SISTEMA) {
+async function verificarSenhaGestor() {
+  const h = await hashSenha(document.getElementById('inputSenhaGestor').value);
+  if (h === SENHA_HASH) {
     fecharModalGestor(); abrirModalColab();
   } else {
     document.getElementById('errSenhaGestor').style.display = 'block';
