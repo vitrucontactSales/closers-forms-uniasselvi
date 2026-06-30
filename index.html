@@ -176,6 +176,35 @@ textarea.ctrl { resize: vertical; min-height: 90px; }
 }
 .toast.show { transform: translateY(0); opacity: 1; }
 
+/* ── Autocomplete modal consultor ── */
+.mc-wrap { position: relative; margin-bottom: 14px; }
+.mc-wrap input {
+  width: 100%; padding: 11px 14px; border: 1.5px solid var(--borda);
+  border-radius: 9px; font-size: .92rem;
+  font-family: 'Nunito Sans', sans-serif;
+  background: var(--input-bg); color: var(--txt);
+  outline: none; transition: border-color .2s;
+}
+.mc-wrap input:focus { border-color: var(--amarelo); box-shadow: 0 0 0 3px rgba(255,212,0,.15); }
+.mc-drop {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+  background: var(--card2); border: 1.5px solid var(--borda-f);
+  border-radius: 9px; max-height: 220px; overflow-y: auto; z-index: 1100; display: none;
+}
+.mc-item {
+  padding: 10px 14px; cursor: pointer; font-size: .88rem; color: var(--txt);
+  transition: background .15s;
+}
+.mc-item:hover, .mc-item.mc-active { background: var(--amarelo-g); color: var(--amarelo); }
+.mc-nenhum { padding: 10px 14px; color: var(--txt3); font-size: .85rem; }
+.mc-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  border-radius: 20px; padding: 5px 14px; font-size: .8rem; font-weight: 700;
+  margin-bottom: 14px;
+}
+.mc-badge-interno { background: rgba(46,204,113,.15); color: #2ECC71; }
+.mc-badge-hag     { background: rgba(59,130,246,.15);  color: #3B82F6; }
+
 /* ── Modais ── */
 .modal-overlay {
   display: none; position: fixed; inset: 0; background: rgba(0,0,0,.75);
@@ -252,6 +281,7 @@ textarea.ctrl { resize: vertical; min-height: 90px; }
   </div>
   <div class="nav-links">
     <button onclick="abrirCadastroGestor()" class="nav-btn ghost">👤 Cadastrar Colaborador</button>
+    <a href="consultor.html" class="nav-btn ghost">⭐ Área do Consultor</a>
     <button onclick="abrirDashboard()" class="nav-btn">📊 Dashboard</button>
   </div>
 </header>
@@ -1698,6 +1728,22 @@ textarea.ctrl { resize: vertical; min-height: 90px; }
   </div>
 </div>
 
+<!-- Modal Área do Consultor -->
+<div class="modal-overlay" id="modalConsultor">
+  <div class="modal-box">
+    <h3>⭐ Área do Consultor</h3>
+    <p>Digite seu nome e selecione na lista para acessar seu painel.</p>
+    <div class="mc-wrap">
+      <input type="text" id="mcBusca" placeholder="Seu nome..." autocomplete="off"
+        oninput="mcFiltrar()" onfocus="mcAbrir()" onkeydown="mcNavegar(event)">
+      <div class="mc-drop" id="mcDrop"></div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-s" onclick="fecharModalConsultor()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal senha dashboard -->
 <div class="modal-overlay" id="modalSenha">
   <div class="modal-box">
@@ -2361,6 +2407,74 @@ async function registrar() {
   toastMsg('✔ Matrícula registrada com sucesso!');
   limpar();
 }
+
+// ── Área do Consultor ──
+let _mcAtivo = -1;
+
+function abrirAreaConsultor() {
+  document.getElementById('mcBusca').value = '';
+  document.getElementById('mcDrop').style.display = 'none';
+  document.getElementById('modalConsultor').classList.add('show');
+  setTimeout(() => document.getElementById('mcBusca').focus(), 100);
+}
+
+function fecharModalConsultor() {
+  document.getElementById('modalConsultor').classList.remove('show');
+}
+
+function mcFiltrar() {
+  const q    = document.getElementById('mcBusca').value.toLowerCase().trim();
+  const drop = document.getElementById('mcDrop');
+  _mcAtivo   = -1;
+  if (!q) { drop.style.display = 'none'; return; }
+  const matches = LISTA_CONSULTORES.filter(n => n.toLowerCase().includes(q));
+  if (!matches.length) {
+    drop.innerHTML = '<div class="mc-nenhum">Nenhum resultado encontrado.</div>';
+  } else {
+    drop.innerHTML = matches.map(n =>
+      `<div class="mc-item" onclick="mcSelecionar('${n.replace(/'/g, "\\'")}')">${n}</div>`
+    ).join('');
+  }
+  drop.style.display = 'block';
+}
+
+function mcAbrir() {
+  const q = document.getElementById('mcBusca').value.toLowerCase().trim();
+  const drop = document.getElementById('mcDrop');
+  if (!q) {
+    drop.innerHTML = LISTA_CONSULTORES.map(n =>
+      `<div class="mc-item" onclick="mcSelecionar('${n.replace(/'/g, "\\'")}')">${n}</div>`
+    ).join('');
+    drop.style.display = 'block';
+  } else { mcFiltrar(); }
+}
+
+function mcSelecionar(nome) {
+  const canal = CONSULTOR_CANAL[nome] || 'EFETIVO';
+  localStorage.setItem('cons_nome', nome);
+  localStorage.setItem('cons_canal', canal);
+  window.location.href = 'consultor.html';
+}
+
+function mcNavegar(e) {
+  const drop  = document.getElementById('mcDrop');
+  const items = drop.querySelectorAll('.mc-item');
+  if (!items.length) return;
+  if      (e.key === 'ArrowDown')  { e.preventDefault(); _mcAtivo = Math.min(_mcAtivo + 1, items.length - 1); }
+  else if (e.key === 'ArrowUp')    { e.preventDefault(); _mcAtivo = Math.max(_mcAtivo - 1, 0); }
+  else if (e.key === 'Enter')      { e.preventDefault(); if (_mcAtivo >= 0) items[_mcAtivo].click(); return; }
+  else if (e.key === 'Escape')     { drop.style.display = 'none'; return; }
+  items.forEach((el, i) => el.classList.toggle('mc-active', i === _mcAtivo));
+  if (_mcAtivo >= 0) items[_mcAtivo].scrollIntoView({ block: 'nearest' });
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.mc-wrap')) {
+    const drop = document.getElementById('mcDrop');
+    if (drop) drop.style.display = 'none';
+  }
+});
+
 
 // ── Dashboard ──
 function abrirDashboard() {
